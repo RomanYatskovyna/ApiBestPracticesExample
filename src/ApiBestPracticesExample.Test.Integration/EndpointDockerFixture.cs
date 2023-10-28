@@ -29,12 +29,6 @@ public sealed class EndpointDockerFixture : DockerFixtureBase<IApiMarker>
 
 
 	}
-	protected override void ConfigureApp(IWebHostBuilder a)
-	{
-		a.ConfigureAppConfiguration(p => p
-			.AddJsonFile(Path.Combine(Directory.GetCurrentDirectory(), "appsettings.Testing.json"), false));
-	}
-
 	protected override void ConfigureServices(IServiceCollection services)
 	{
 		services.RemoveAll(typeof(DbContextOptions<AppDbContext>));
