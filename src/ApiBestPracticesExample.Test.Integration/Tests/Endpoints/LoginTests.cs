@@ -1,7 +1,6 @@
 ﻿using ApiBestPracticesExample.Infrastructure.Endpoints.Authentication.V1;
 
 namespace ApiBestPracticesExample.Test.Integration.Tests.Endpoints;
-[Collection("DockerCollection")]
 public sealed class LoginTests : BaseTest
 {
     [Fact]
@@ -12,7 +11,7 @@ public sealed class LoginTests : BaseTest
         //Act
         var (rsp, res) = await Fixture.Client.POSTAsync<LoginEndpointV1, LoginRequest, TokenResponse>(new()
         {
-            Username = "admin@gmail.com",
+            Username = "ReadOnlyAdmin@gmail.com",
             Password = "Qwerty123$"
         });
 
