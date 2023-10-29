@@ -9,6 +9,7 @@ using ApiBestPracticesExample.Infrastructure.Database;
 using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using StackExchange.Redis;
+using Microsoft.Extensions.Configuration;
 
 namespace ApiBestPracticesExample.Presentation;
 
@@ -16,7 +17,6 @@ public static class DependencyInjection
 {
 	public static IServiceCollection AddDefaultServices(this IServiceCollection services, IConfiguration configuration, List<Assembly> endpointAssemblies, List<int> supportedVersions)
 	{
-
 		services.AddSerilog(logger =>
 		{
 			logger.ReadFrom.Configuration(configuration);

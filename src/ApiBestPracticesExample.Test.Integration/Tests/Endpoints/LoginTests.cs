@@ -11,7 +11,7 @@ public sealed class LoginTests : BaseTest
         //Act
         var (rsp, res) = await Fixture.Client.POSTAsync<LoginEndpointV1, LoginRequest, TokenResponse>(new()
         {
-            Username = "ReadOnlyAdmin@gmail.com",
+            UserId = "ReadOnlyAdmin@gmail.com",
             Password = "Qwerty123$"
         });
 

@@ -2,10 +2,10 @@
 
 namespace ApiBestPracticesExample.Contracts.Requests;
 
-public class LoginRequest
+public sealed class LoginRequest
 {
-	[DefaultValue("1")]
-	public string Username { get; set; } = null!;
+	[DefaultValue("email/phoneNumber")]
+	public string UserId { get; set; } = null!;
 	[DefaultValue("Qwerty123$")]
 	public string Password { get; set; } = null!;
 }

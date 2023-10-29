@@ -1,12 +1,7 @@
-﻿using System.Security.Claims;
-using ApiBestPracticesExample.Contracts.Requests;
-using ApiBestPracticesExample.Infrastructure.Database;
+﻿using ApiBestPracticesExample.Infrastructure.Database;
 using ApiBestPracticesExample.Infrastructure.Services;
-using FastEndpoints;
-using FastEndpoints.Security;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
+using System.Security.Claims;
 
 namespace ApiBestPracticesExample.Infrastructure.Endpoints.Authentication.V1;
 
@@ -42,11 +37,11 @@ public class LoginEndpointV1 : Endpoint<LoginRequest, TokenResponse>
 
 	public override async Task HandleAsync(LoginRequest req, CancellationToken ct)
 	{
-		var user = await _context.Users.SingleOrDefaultAsync(u => u.Email == req.Username, ct);
+		var user = await _context.Users.SingleOrDefaultAsync(u => u.Email == req.UserId, ct);
 		if (user is null || !PasswordEncrypter.VerifyPassword(req.Password, user.PasswordHash))
 			ThrowError("The supplied credentials are invalid!", 400);
 
-		Response = await CreateTokenWith<TokenService>(user.Email, u =>
+		Response = await CreateTokenWith<RefreshTokenEndpointV1>(user.Email, u =>
 		{
 			u.Roles.AddRange(new[] { user.RoleName });
 			u.Claims.Add(new Claim("Email", user.Email));

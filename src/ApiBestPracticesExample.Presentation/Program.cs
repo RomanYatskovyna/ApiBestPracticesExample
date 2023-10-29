@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Configuration.AddEnvironmentVariables();
 builder.Services.AddDefaultServices(builder.Configuration, new List<Assembly>
 {
 	typeof(CreateUserEndpointV1).Assembly

@@ -1,8 +1,6 @@
 ﻿using ApiBestPracticesExample.Contracts.Dtos.User;
 using ApiBestPracticesExample.Infrastructure.Database;
 using ApiBestPracticesExample.Infrastructure.Mappers;
-using FastEndpoints;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
