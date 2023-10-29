@@ -24,19 +24,22 @@ public static class DependencyInjection
 			config.Assemblies = endpointAssemblies;
 		});
 		foreach (var version in supportedVersions)
+		{
 			services.SwaggerDocument(swaggerConfig =>
 			{
 				swaggerConfig.MaxEndpointVersion = version;
+				var swaggerSection = configuration.GetRequiredSection("Swagger");
 				swaggerConfig.DocumentSettings = settings =>
 				{
-					settings.DocumentName = version.ToString();
-
-					settings.Description = "123";
-					settings.Title = "My API";
+					settings.DocumentName = $"v{version}";
+					settings.Title = swaggerSection["Title"];
+					settings.Description = swaggerSection["Description"];
 					settings.Version = version.ToString();
 				};
 				swaggerConfig.ShortSchemaNames = true;
 			});
+		}
+			
 		services.AddAuthorization();
 		services.AddJWTBearerAuth(configuration.GetRequiredSection("Jwt").GetRequiredValue("AccessTokenSigningKey"));
 		return services;
