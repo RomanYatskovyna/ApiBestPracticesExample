@@ -6,8 +6,8 @@ public static class PasswordEncrypter
     // Generate a salted and hashed password
     public static string HashPassword(string password)
     {
-        string salt = BCrypt.Net.BCrypt.GenerateSalt(WorkFactor);
-        string hashedPassword = BCrypt.Net.BCrypt.HashPassword(password, salt);
+        var salt = BCrypt.Net.BCrypt.GenerateSalt(WorkFactor);
+        var hashedPassword = BCrypt.Net.BCrypt.HashPassword(password, salt);
         return hashedPassword;
     }
 

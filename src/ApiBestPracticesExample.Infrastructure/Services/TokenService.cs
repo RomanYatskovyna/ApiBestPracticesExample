@@ -36,7 +36,6 @@ public sealed class TokenService : RefreshTokenService<TokenRequest, TokenRespon
 		user.RefreshTokenExpiration = response.RefreshExpiry;
 		await _context.SaveChangesAsync();
 	}
-
 	public override async Task RefreshRequestValidationAsync(TokenRequest req)
 	{
 		var user = await _context.Users.AsTracking().SingleAsync(u => u.Email == req.UserId);

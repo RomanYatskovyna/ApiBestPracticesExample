@@ -4,6 +4,9 @@ using FastEndpoints;
 using FastEndpoints.Security;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using ApiBestPracticesExample.Infrastructure.Database;
+using Microsoft.AspNetCore.OutputCaching;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace ApiBestPracticesExample.Presentation;
 
@@ -34,8 +37,6 @@ public static class DependencyInjection
 				};
 				swaggerConfig.ShortSchemaNames = true;
 			});
-
-
 		services.AddAuthorization();
 		services.AddJWTBearerAuth(configuration.GetRequiredSection("Jwt").GetRequiredValue("AccessTokenSigningKey"));
 		return services;
@@ -65,5 +66,15 @@ public static class DependencyInjection
 					.UseSqlServer(connectionString, sqlServerOptions =>
 						sqlServerOptions.MigrationsAssembly("ApiBestPracticesExample.Infrastructure"))
 					.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking));
+	}
+
+	public static async Task<WebApplication> PerformDbPreparationAsync(this WebApplication app)
+	{
+		await using var scope = app.Services.CreateAsyncScope();
+		var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+		var logger = app.Services.GetRequiredService<ILogger>();
+		await context.Database.MigrateAsync();
+		await context.SeedDataAsync(logger);
+		return app;
 	}
 }

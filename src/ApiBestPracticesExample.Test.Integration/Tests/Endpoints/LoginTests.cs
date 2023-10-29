@@ -1,14 +1,9 @@
 ﻿using ApiBestPracticesExample.Infrastructure.Endpoints.Authentication.V1;
-using ApiBestPracticesExample.Presentation;
 
 namespace ApiBestPracticesExample.Test.Integration.Tests.Endpoints;
-
-public sealed class LoginContextTests : BaseContextTest
+[Collection("DockerCollection")]
+public sealed class LoginTests : BaseTest
 {
-    public LoginContextTests(EndpointDockerFixture f, ITestOutputHelper o) : base(f, o)
-    {
-    }
-
     [Fact]
     public async Task LoginSuccessTests()
     {
@@ -23,9 +18,12 @@ public sealed class LoginContextTests : BaseContextTest
 
         //Assert
         rsp.IsSuccessStatusCode.Should().BeTrue();
-        var dbToken = DbContext.Users.Single(u => u.Email == res.UserId).RefreshToken;
-        res.RefreshToken.Should().Be(dbToken);
+        var dbUser =await DbContext.Users.SingleAsync(u => u.Email == res.UserId);
+        res.RefreshToken.Should().Be(dbUser.RefreshToken);
     }
 
 
+    public LoginTests(EndpointDockerFixture fixture, ITestOutputHelper outputHelper) : base(fixture, outputHelper)
+    {
+    }
 }
