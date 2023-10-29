@@ -8,6 +8,10 @@ EXPOSE 443
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
 COPY ["ApiBestPracticesExample.Presentation/ApiBestPracticesExample.Presentation.csproj", "ApiBestPracticesExample.Presentation/"]
+COPY ["ApiBestPracticesExample.Infrastructure/ApiBestPracticesExample.Infrastructure.csproj", "ApiBestPracticesExample.Infrastructure/"]
+COPY ["ApiBestPracticesExample.Application/ApiBestPracticesExample.Application.csproj", "ApiBestPracticesExample.Application/"]
+COPY ["ApiBestPracticesExample.Contracts/ApiBestPracticesExample.Contracts.csproj", "ApiBestPracticesExample.Contracts/"]
+COPY ["ApiBestPracticesExample.Domain/ApiBestPracticesExample.Domain.csproj", "ApiBestPracticesExample.Domain/"]
 RUN dotnet restore "ApiBestPracticesExample.Presentation/ApiBestPracticesExample.Presentation.csproj"
 COPY . .
 WORKDIR "/src/ApiBestPracticesExample.Presentation"

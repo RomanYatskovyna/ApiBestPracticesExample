@@ -10,8 +10,8 @@ public class ErrorLogger : IGlobalPostProcessor
 	{
 		if (failures.Count > 0)
 		{
-			var logger = ctx.Resolve<ILogger<ErrorLogger>>();
-			logger.LogWarning("Validation error count: {@count}", failures.Count);
+			var logger = ctx.Resolve<ILogger>();
+			logger.Warning("Validation error count: {Count}", failures.Count);
 		}
 
 		return Task.CompletedTask;

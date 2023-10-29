@@ -6,6 +6,7 @@ using FastEndpoints;
 using FastEndpoints.Security;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace ApiBestPracticesExample.Infrastructure.Endpoints.Authentication.V1;
 
@@ -24,13 +25,18 @@ public class LoginEndpointV1 : Endpoint<LoginRequest, TokenResponse>
 		AllowAnonymous();
 		Description(d =>
 		{
-			d.WithDisplayName("Login"); 
+			d.WithDisplayName("Login");
 		});
 		Summary(s =>
 		{
 			s.Summary = "short summary goes here";
 			s.Description = "long description goes here";
 		});
+		//Options(x => x.CacheOutput(p =>
+		//{
+		//	p.Tag("login");
+		//	p.Expire(TimeSpan.FromSeconds(60));
+		//}));
 		Version((int)ApiSupportedVersions.V1);
 	}
 

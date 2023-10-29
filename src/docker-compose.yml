@@ -1,0 +1,15 @@
+version: '3.4'
+
+services:
+  apibestpracticesexample.presentation:
+    image: ${DOCKER_REGISTRY-}apibestpracticesexamplepresentation
+    build:
+      context: .
+      dockerfile: ApiBestPracticesExample.Presentation/Dockerfile
+    depends_on:
+      - sqlserver
+      - redis
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:latest
+  redis:
+    image: redis:latest

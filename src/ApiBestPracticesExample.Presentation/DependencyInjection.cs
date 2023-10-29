@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using ApiBestPracticesExample.Infrastructure.Caching;
 using FastEndpoints.Swagger;
 using FastEndpoints;
 using FastEndpoints.Security;
@@ -7,6 +8,7 @@ using Serilog;
 using ApiBestPracticesExample.Infrastructure.Database;
 using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using StackExchange.Redis;
 
 namespace ApiBestPracticesExample.Presentation;
 
@@ -39,9 +41,11 @@ public static class DependencyInjection
 				swaggerConfig.ShortSchemaNames = true;
 			});
 		}
-			
+
 		services.AddAuthorization();
 		services.AddJWTBearerAuth(configuration.GetRequiredSection("Jwt").GetRequiredValue("AccessTokenSigningKey"));
+
+		services.AddRedisOutputCache(configuration.GetRequiredConnectionString("RedisConnection"));
 		return services;
 	}
 	public static WebApplication UseDefaultServices(this WebApplication app)
@@ -75,9 +79,21 @@ public static class DependencyInjection
 	{
 		await using var scope = app.Services.CreateAsyncScope();
 		var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-		var logger = app.Services.GetRequiredService<ILogger>();
 		await context.Database.MigrateAsync();
+		var logger = app.Services.GetRequiredService<ILogger>();
+		logger.Information("Database migrated successfully");
 		await context.SeedDataAsync(logger);
 		return app;
+	}
+
+	public static IServiceCollection AddRedisOutputCache(this IServiceCollection services, string? redisConStr)
+	{
+		services.AddOutputCache();
+		if (redisConStr is null)
+			return services;
+		services.RemoveAll<IOutputCacheStore>();
+		services.AddSingleton<IOutputCacheStore, RedisOutputCacheStore>();
+		services.AddSingleton<IConnectionMultiplexer>(_ => ConnectionMultiplexer.Connect(redisConStr));
+		return services;
 	}
 }

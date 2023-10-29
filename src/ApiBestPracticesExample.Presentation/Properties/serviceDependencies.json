@@ -1,0 +1,17 @@
+{
+  "dependencies": {
+    "redis1": {
+      "type": "redis",
+      "connectionId": "ConnectionStrings:RedisConnection"
+    },
+    "mssql1": {
+      "type": "mssql",
+      "connectionId": "ConnectionStrings:SqlConnection",
+      "dynamicId": null
+    },
+    "secrets1": {
+      "type": "secrets",
+      "dynamicId": null
+    }
+  }
+}
