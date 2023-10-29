@@ -20,11 +20,5 @@ app.UseDefaultServices();
 //	var logger=scope.ServiceProvider.GetRequiredService<ILogger>();
 //	await context.SeedDataAsync(logger);
 //});
-await using (var scope = app.Services.CreateAsyncScope())
-{
-	var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-	var logger = scope.ServiceProvider.GetRequiredService<ILogger>();
-	await context.Database.MigrateAsync();
-	await context.SeedDataAsync(logger);
-}
+await app.PerformDbPreparationAsync();
 await app.RunAsync();
