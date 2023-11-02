@@ -1,13 +1,8 @@
 ﻿using ApiBestPracticesExample.Contracts;
 using ApiBestPracticesExample.Domain.Entities;
 using ApiBestPracticesExample.Infrastructure.Services;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using Polly;
-using Polly.Retry;
 using System.Reflection;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace ApiBestPracticesExample.Infrastructure.Database;
 public static class AppDbContextSeeder
@@ -42,7 +37,7 @@ public static class AppDbContextSeeder
 		async Task SeedRolesAsync()
 		{
 			var roleFields = typeof(Roles).GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy);
-			var roleNames = roleFields.Select(r => r.GetValue(null)!.ToString());
+			var roleNames = roleFields.Select(r => r.GetValue(null)!.ToString()!).ToList();
 			foreach (var roleName in roleNames)
 			{
 				if (!await context.Roles.AnyAsync(role => role.Name == roleName))
@@ -54,6 +49,9 @@ public static class AppDbContextSeeder
 					logger.Information("Roles {RoleName} seeded successfully", roleName);
 				}
 			}
+			var roleDeletedCount = await context.Roles.Where(r => !roleNames.Contains(r.Name)).ExecuteDeleteAsync();
+			logger.Information("{RoleDeletedCount} Roles  deleted successfully", roleDeletedCount);
+
 			await context.SaveChangesAsync();
 		}
 	}

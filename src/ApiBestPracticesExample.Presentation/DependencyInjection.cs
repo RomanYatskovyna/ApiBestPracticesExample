@@ -9,7 +9,6 @@ using ApiBestPracticesExample.Infrastructure.Database;
 using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using StackExchange.Redis;
-using Microsoft.Extensions.Configuration;
 
 namespace ApiBestPracticesExample.Presentation;
 

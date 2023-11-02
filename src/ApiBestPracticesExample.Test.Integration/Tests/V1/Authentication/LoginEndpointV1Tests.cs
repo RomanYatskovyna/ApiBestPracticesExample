@@ -1,7 +1,7 @@
 ﻿using ApiBestPracticesExample.Infrastructure.Endpoints.Authentication.V1;
 
-namespace ApiBestPracticesExample.Test.Integration.Tests.Endpoints;
-public sealed class LoginTests : BaseTest
+namespace ApiBestPracticesExample.Test.Integration.Tests.V1.Authentication;
+public sealed class LoginEndpointV1Tests : BaseTest
 {
     [Fact]
     public async Task LoginSuccessTests()
@@ -17,12 +17,12 @@ public sealed class LoginTests : BaseTest
 
         //Assert
         rsp.IsSuccessStatusCode.Should().BeTrue();
-        var dbUser =await DbContext.Users.SingleAsync(u => u.Email == res.UserId);
+        var dbUser = await DbContext.Users.SingleAsync(u => u.Email == res.UserId);
         res.RefreshToken.Should().Be(dbUser.RefreshToken);
     }
 
 
-    public LoginTests(EndpointDockerFixture fixture, ITestOutputHelper outputHelper) : base(fixture, outputHelper)
+    public LoginEndpointV1Tests(EndpointDockerFixture fixture, ITestOutputHelper outputHelper) : base(fixture, outputHelper)
     {
     }
 }

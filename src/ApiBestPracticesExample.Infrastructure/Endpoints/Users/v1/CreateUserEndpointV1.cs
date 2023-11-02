@@ -4,7 +4,7 @@ using ApiBestPracticesExample.Infrastructure.Mappers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
-namespace ApiBestPracticesExample.Infrastructure.Endpoints.Users.v1;
+namespace ApiBestPracticesExample.Infrastructure.Endpoints.Users.V1;
 
 public sealed class CreateUserEndpointV1 : Endpoint<UserCreateDto, UserDto>
 {

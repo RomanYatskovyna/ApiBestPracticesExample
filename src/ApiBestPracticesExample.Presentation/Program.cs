@@ -1,8 +1,7 @@
 using ApiBestPracticesExample.Infrastructure;
 using ApiBestPracticesExample.Infrastructure.Database;
-using ApiBestPracticesExample.Infrastructure.Endpoints.Users.v1;
+using ApiBestPracticesExample.Infrastructure.Endpoints.Users.V1;
 using ApiBestPracticesExample.Presentation;
-using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,5 +14,9 @@ var conStr = builder.Configuration.GetRequiredConnectionString("SqlConnection");
 builder.Services.AddCustomDbContext<AppDbContext>(conStr);
 var app = builder.Build();
 app.UseDefaultServices();
-await app.PerformDbPreparationAsync();
+if (app.Configuration.GetRequiredValue<bool>("InitDefaultData"))
+{
+	await app.PerformDbPreparationAsync();
+}
+
 await app.RunAsync();

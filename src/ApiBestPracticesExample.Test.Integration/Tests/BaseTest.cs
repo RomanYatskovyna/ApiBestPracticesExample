@@ -14,4 +14,9 @@ public abstract class BaseTest
 		OutputHelper = outputHelper;
 		DbContext = Fixture.Services.GetRequiredService<AppDbContext>();
 	}
+
+	protected void LoginAsDefaultAdmin()
+	{
+
+	}
 }
