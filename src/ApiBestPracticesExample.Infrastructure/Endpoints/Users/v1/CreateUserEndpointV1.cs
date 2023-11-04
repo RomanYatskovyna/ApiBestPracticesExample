@@ -9,11 +9,10 @@ namespace ApiBestPracticesExample.Infrastructure.Endpoints.Users.V1;
 public sealed class CreateUserEndpointV1 : Endpoint<UserCreateDto, UserDto>
 {
 	private readonly AppDbContext _context;
-
 	public override void Configure()
 	{
 		Post("users/create");
-		//Roles("Bom");
+		Roles(Contracts.SupportedRoles.Admin);
 		Description(d => { d.WithDisplayName("CreateUser"); });
 		Summary(s =>
 		{
@@ -32,15 +31,9 @@ public sealed class CreateUserEndpointV1 : Endpoint<UserCreateDto, UserDto>
 		if (await _context.Users.AnyAsync(u => u.Email == req.Email, ct))
 			ThrowError($"User with email {req.Email} already exists", 400);
 		var user = req.MapUserCreateDtoToUser();
-		user.RoleName = "Bom";
+		user.RoleName = Contracts.SupportedRoles.User;
 		await _context.AddAsync(user, ct);
 		await _context.SaveChangesAsync(ct);
-		TypedResults.Ok(user.MapUserToUserDto());
+		Response = user.MapUserToUserDto();
 	}
-	
-
-	//public override Task<UserDto> ExecuteAsync(UserCreateDto req, CancellationToken ct)
-	//{
-	//	return base.ExecuteAsync(req, ct);
-	//}
 }

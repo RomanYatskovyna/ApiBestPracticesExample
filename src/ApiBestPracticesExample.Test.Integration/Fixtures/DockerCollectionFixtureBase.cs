@@ -114,7 +114,6 @@ public abstract class DockerCollectionFixtureBase<TProgram> : BaseFixture, IAsyn
 
     public virtual async Task DisposeAsync()
     {
-        Client.Dispose();
         await TearDownAsync();
         var dockerTasks = _dockerContainers.Select(container => container.Value.StopAsync()).ToArray();
         await Task.WhenAll(dockerTasks);

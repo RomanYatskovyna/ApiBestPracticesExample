@@ -2,6 +2,7 @@
 using ApiBestPracticesExample.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
 
 namespace ApiBestPracticesExample.Infrastructure.Endpoints.Authentication.V1;
 
@@ -39,12 +40,11 @@ public class LoginEndpointV1 : Endpoint<LoginRequest, TokenResponse>
 	{
 		var user = await _context.Users.SingleOrDefaultAsync(u => u.Email == req.UserId, ct);
 		if (user is null || !PasswordEncrypter.VerifyPassword(req.Password, user.PasswordHash))
-			ThrowError("The supplied credentials are invalid!", 400);
-
+			ThrowError("User with supplied credentials was not found", StatusCodes.Status404NotFound);
 		Response = await CreateTokenWith<RefreshTokenEndpointV1>(user.Email, u =>
 		{
 			u.Roles.AddRange(new[] { user.RoleName });
-			u.Claims.Add(new Claim("Email", user.Email));
+			u.Claims.Add(new Claim(ClaimTypes.Email,user.Email));
 		});
 	}
 }

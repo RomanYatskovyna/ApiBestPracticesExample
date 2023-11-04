@@ -1,5 +1,4 @@
 global using ApiBestPracticesExample.Contracts.Requests;
-global using ApiBestPracticesExample.Contracts.Responses;
 global using ApiBestPracticesExample.Infrastructure.Database;
 global using ApiBestPracticesExample.Test.Integration.Fixtures;
 global using FastEndpoints;

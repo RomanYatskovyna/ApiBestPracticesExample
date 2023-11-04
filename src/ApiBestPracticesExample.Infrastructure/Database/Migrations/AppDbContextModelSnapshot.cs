@@ -30,7 +30,7 @@ namespace ApiBestPracticesExample.Infrastructure.Database.Migrations
 
                     b.HasKey("Name");
 
-                    b.ToTable("Roles");
+                    b.ToTable("SupportedRoles");
                 });
 
             modelBuilder.Entity("ApiBestPracticesExample.Domain.Entities.User", b =>
