@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
 
 namespace ApiBestPracticesExample.Infrastructure.Endpoints.Authentication.V1;
 
@@ -46,11 +47,13 @@ public sealed class RefreshTokenEndpointV1 : RefreshTokenService<TokenRequest, T
 	}
 	public override async Task RefreshRequestValidationAsync(TokenRequest req)
 	{
-		var user = await _context.Users.SingleAsync(u => u.Email == req.UserId);
+		var user = await _context.Users.SingleOrDefaultAsync(u => u.Email == req.UserId);
+		if(user is null)
+			ThrowError(r => r.UserId, "User with this UserId does not exist",StatusCodes.Status404NotFound);
 		if (user.RefreshToken is null || user.RefreshToken != req.RefreshToken)
-			AddError(r => r.RefreshToken, "Refresh token is invalid!");
+			ThrowError(r => r.RefreshToken, "Refresh token is invalid!");
 		if (user.RefreshTokenExpiration is null || user.RefreshTokenExpiration < DateTime.Now.AddHours(Config.GetValue<int>("RefreshTokenExpirationInHours")))
-			AddError(r => r.RefreshToken, "Refresh token is expired!");
+			ThrowError(r => r.RefreshToken, "Refresh token is expired!");
 	}
 
 	public override async Task SetRenewalPrivilegesAsync(TokenRequest request, UserPrivileges privileges)

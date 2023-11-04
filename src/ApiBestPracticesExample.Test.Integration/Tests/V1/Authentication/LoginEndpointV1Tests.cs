@@ -5,7 +5,7 @@ namespace ApiBestPracticesExample.Test.Integration.Tests.V1.Authentication;
 public sealed class LoginEndpointV1Tests : BaseTest
 {
 	[Fact]
-	public async Task LoginAsDefaultAdminSuccess()
+	public async Task Returns_200Token_When_AdminExists()
 	{
 		//Arrange
 		var request = new LoginRequest
@@ -16,7 +16,7 @@ public sealed class LoginEndpointV1Tests : BaseTest
 		//Act
 		var (rsp, res) = await Anonymous.POSTAsync<LoginEndpointV1, LoginRequest, TokenResponse>(request);
 		//Assert
-		rsp.IsSuccessStatusCode.Should().BeTrue();
+		rsp.StatusCode.Should().Be(HttpStatusCode.OK);
 		var dbUser = await DbContext.Users.SingleAsync(u => u.Email == res.UserId);
 		res.RefreshToken.Should().Be(dbUser.RefreshToken);
 
@@ -25,7 +25,7 @@ public sealed class LoginEndpointV1Tests : BaseTest
 		claims.Should().Contain(c => c.Type == "email" && c.Value == dbUser.Email);
 	}
 	[Fact]
-	public async Task LoginAsDefaultUserSuccess()
+	public async Task Returns_200Token_When_UserExists()
 	{
 		//Arrange
 		var request = new LoginRequest
@@ -36,7 +36,7 @@ public sealed class LoginEndpointV1Tests : BaseTest
 		//Act
 		var (rsp, res) = await Anonymous.POSTAsync<LoginEndpointV1, LoginRequest, TokenResponse>(request);
 		//Assert
-		rsp.IsSuccessStatusCode.Should().BeTrue();
+		rsp.StatusCode.Should().Be(HttpStatusCode.OK);
 		var dbUser = await DbContext.Users.SingleAsync(u => u.Email == res.UserId);
 		res.RefreshToken.Should().Be(dbUser.RefreshToken);
 
@@ -46,7 +46,7 @@ public sealed class LoginEndpointV1Tests : BaseTest
 	}
 
 	[Fact]
-	public async Task LoginWithWrongUsernameFailsValidation()
+	public async Task Returns_404_When_UserIdAbsent()
 	{
 		//Arrange
 		var request = new LoginRequest
@@ -55,12 +55,12 @@ public sealed class LoginEndpointV1Tests : BaseTest
 			Password = AppDbContextSeeder.DefaultAdminPassword
 		};
 		//Act
-		var (rsp, res) = await Anonymous.POSTAsync<LoginEndpointV1, LoginRequest, TokenResponse>(request);
+		var (rsp, res) = await Anonymous.POSTAsync<LoginEndpointV1, LoginRequest, string>(request);
 		//Assert
 		rsp.StatusCode.Should().Be(HttpStatusCode.NotFound);
 	}
 	[Fact]
-	public async Task LoginWithWrongPasswordFailsValidation()
+	public async Task Returns_404_When_PasswordIsWrong()
 	{
 		//Arrange
 		var request = new LoginRequest

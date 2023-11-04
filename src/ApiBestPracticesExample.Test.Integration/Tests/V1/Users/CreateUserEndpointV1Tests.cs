@@ -8,7 +8,7 @@ namespace ApiBestPracticesExample.Test.Integration.Tests.V1.Users;
 public sealed class CreateUserEndpointV1Tests : BaseTest
 {
 	[Fact]
-	public async Task CreateUserShouldBeSuccessful()
+	public async Task Returns_200CreatedUser_When_Expected()
 	{
 		//Arrange
 		var request = new UserCreateDto
@@ -19,16 +19,16 @@ public sealed class CreateUserEndpointV1Tests : BaseTest
 		//Act
 		var (rsp, res) = await Admin.POSTAsync<CreateUserEndpointV1, UserCreateDto, UserDto>(request);
 		//Assert
-		rsp.IsSuccessStatusCode.Should().BeTrue();
+		rsp.StatusCode.Should().Be(HttpStatusCode.OK);
 		res.Email.Should().Be(res.Email);
 	}
 	[Fact]
-	public async Task CreateUserShouldFailValidation()
+	public async Task Returns_400ProblemDetails_When_DataIsInvalid()
 	{
 		//Arrange
 		var request = new UserCreateDto
 		{
-			Email = "NotEmail",
+			Email = "WrongEmail",
 			Password = "w"
 		};
 		//Act
@@ -38,13 +38,13 @@ public sealed class CreateUserEndpointV1Tests : BaseTest
 		res.Errors.Should().ContainKeys("email", "password");
 	}
 	[Fact]
-	public async Task CreateUserShouldFailValidationBecauseOfAlreadyExistingUser()
+	public async Task Returns_400ProblemDetails_When_USerWithEmailAlreadyExists()
 	{
 		//Arrange
 		var request = new UserCreateDto
 		{
 			Email = AppDbContextSeeder.DefaultUser.Email,
-			Password = "Qwerty123$"
+			Password = AppDbContextSeeder.DefaultUserPassword
 		};
 		//Act
 		var (rsp, res) = await Admin.POSTAsync<CreateUserEndpointV1, UserCreateDto, ValidationProblemDetails>(request);

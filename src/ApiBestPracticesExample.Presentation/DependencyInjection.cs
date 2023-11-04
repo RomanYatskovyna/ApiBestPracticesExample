@@ -59,6 +59,7 @@ public static class DependencyInjection
 		//app.UseSerilogRequestLogging();
 		app.UseAuthentication();
 		app.UseAuthorization();
+		app.UseDefaultExceptionHandler();
 		app.UseFastEndpoints(config =>
 		{
 			config.Endpoints.Configurator = ep =>
