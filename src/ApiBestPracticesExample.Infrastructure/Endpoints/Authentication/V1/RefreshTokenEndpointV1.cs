@@ -7,11 +7,9 @@ namespace ApiBestPracticesExample.Infrastructure.Endpoints.Authentication.V1;
 
 public sealed class RefreshTokenEndpointV1 : RefreshTokenService<TokenRequest, TokenResponse>
 {
-	private readonly IConfiguration _config;
 	private readonly AppDbContext _context;
 	public RefreshTokenEndpointV1(IConfiguration config, AppDbContext context)
 	{
-		_config = config;
 		_context = context;
 		var jwtSection = config.GetRequiredSection("Jwt");
 		var signingKey = jwtSection["AccessTokenSigningKey"];
@@ -48,7 +46,7 @@ public sealed class RefreshTokenEndpointV1 : RefreshTokenService<TokenRequest, T
 	}
 	public override async Task RefreshRequestValidationAsync(TokenRequest req)
 	{
-		var user = await _context.Users.AsTracking().SingleAsync(u => u.Email == req.UserId);
+		var user = await _context.Users.SingleAsync(u => u.Email == req.UserId);
 		if (user.RefreshToken is null || user.RefreshToken != req.RefreshToken)
 			AddError(r => r.RefreshToken, "Refresh token is invalid!");
 		if (user.RefreshTokenExpiration is null || user.RefreshTokenExpiration < DateTime.Now.AddHours(Config.GetValue<int>("RefreshTokenExpirationInHours")))
@@ -57,7 +55,7 @@ public sealed class RefreshTokenEndpointV1 : RefreshTokenService<TokenRequest, T
 
 	public override async Task SetRenewalPrivilegesAsync(TokenRequest request, UserPrivileges privileges)
 	{
-		var user = await _context.Users.AsTracking().SingleAsync(u => u.Email == request.UserId);
+		var user = await _context.Users.SingleAsync(u => u.Email == request.UserId);
 		privileges.Roles.Add(user.RoleName);
 		privileges.Claims.Add(new Claim(ClaimTypes.Email, user.Email));
 	}

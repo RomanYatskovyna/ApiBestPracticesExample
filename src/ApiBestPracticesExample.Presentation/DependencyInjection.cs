@@ -1,23 +1,22 @@
-﻿using System.Reflection;
-using ApiBestPracticesExample.Infrastructure.Caching;
-using FastEndpoints.Swagger;
+﻿using ApiBestPracticesExample.Infrastructure.Caching;
+using ApiBestPracticesExample.Infrastructure.Database;
 using FastEndpoints;
 using FastEndpoints.Security;
-using Microsoft.EntityFrameworkCore;
-using Serilog;
-using ApiBestPracticesExample.Infrastructure.Database;
-using FluentValidation;
-using Microsoft.AspNetCore.OutputCaching;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using StackExchange.Redis;
-using Order = FastEndpoints.Order;
+using FastEndpoints.Swagger;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.OutputCaching;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Serilog;
+using StackExchange.Redis;
+using System.Reflection;
+using Order = FastEndpoints.Order;
 
 namespace ApiBestPracticesExample.Presentation;
 
 public static class DependencyInjection
 {
-	public static IServiceCollection AddDefaultServices(this IServiceCollection services, IConfiguration configuration, List<Assembly> endpointAssemblies, List<Assembly> validationAssemblies, List<int> supportedVersions)
+	public static IServiceCollection AddDefaultServices(this IServiceCollection services, IConfiguration configuration, List<Assembly> endpointAssemblies, List<int> supportedVersions)
 	{
 		services.AddSerilog(logger =>
 		{
@@ -26,8 +25,8 @@ public static class DependencyInjection
 		services.AddFastEndpoints(config =>
 		{
 			config.Assemblies = endpointAssemblies;
+			config.IncludeAbstractValidators = true;
 		});
-		services.AddValidatorsFromAssemblies(validationAssemblies);
 		foreach (var version in supportedVersions)
 		{
 			services.SwaggerDocument(swaggerConfig =>
@@ -44,15 +43,8 @@ public static class DependencyInjection
 				swaggerConfig.ShortSchemaNames = true;
 			});
 		}
-
-		services.AddAuthentication(options =>
-		{
-			options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-			options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-			options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-		});
 		services.AddAuthorization();
-		services.AddJWTBearerAuth(configuration.GetRequiredSection("Jwt").GetRequiredValue("AccessTokenSigningKey"),JWTBearer.TokenSigningStyle.Symmetric,v=>
+		services.AddJWTBearerAuth(configuration.GetRequiredSection("Jwt").GetRequiredValue("AccessTokenSigningKey"), JWTBearer.TokenSigningStyle.Symmetric, v =>
 		{
 			v.ClockSkew = TimeSpan.FromSeconds(30);
 			v.ValidateLifetime = true;
@@ -64,14 +56,14 @@ public static class DependencyInjection
 	}
 	public static WebApplication UseDefaultServices(this WebApplication app)
 	{
-		app.UseSerilogRequestLogging();
+		//app.UseSerilogRequestLogging();
 		app.UseAuthentication();
 		app.UseAuthorization();
 		app.UseFastEndpoints(config =>
 		{
 			config.Endpoints.Configurator = ep =>
 			{
-				ep.PostProcessors(Order.After,new ErrorLogger());
+				ep.PostProcessors(Order.After, new ErrorLogger());
 			};
 			config.Endpoints.ShortNames = true;
 			config.Endpoints.RoutePrefix = "api";
@@ -81,7 +73,7 @@ public static class DependencyInjection
 		app.UseSwaggerGen();
 		return app;
 	}
-	public static IServiceCollection AddCustomDbContext<TContext>(this IServiceCollection services, string connectionString,bool isDevelopment) where TContext : DbContext
+	public static IServiceCollection AddCustomDbContext<TContext>(this IServiceCollection services, string connectionString, bool isDevelopment) where TContext : DbContext
 	{
 		return services.AddDbContext<TContext>(options =>
 		{
@@ -95,16 +87,14 @@ public static class DependencyInjection
 		});
 	}
 
-	public static async Task<IServiceProvider> PerformDbPreparationAsync(this IServiceProvider services, bool initData = true, bool migrateDatabase = true)
+	public static async Task<IServiceProvider> PerformDbPreparationAsync(this IServiceProvider services, bool initData = true)
 	{
 		await using var scope = services.CreateAsyncScope();
 		await using var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 		var logger = services.GetRequiredService<ILogger>();
-		if (migrateDatabase)
-		{
-			await context.Database.MigrateAsync();
-			logger.Information("Database migrated successfully");
-		}
+
+		await context.Database.MigrateAsync();
+		logger.Information("Database migrated successfully");
 		if (initData)
 		{
 			await context.SeedDataAsync(logger);

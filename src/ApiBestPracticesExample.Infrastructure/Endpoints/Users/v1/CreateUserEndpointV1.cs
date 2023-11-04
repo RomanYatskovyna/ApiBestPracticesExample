@@ -29,7 +29,7 @@ public sealed class CreateUserEndpointV1 : Endpoint<UserCreateDto, UserDto>
 	public override async Task HandleAsync(UserCreateDto req, CancellationToken ct)
 	{
 		if (await _context.Users.AnyAsync(u => u.Email == req.Email, ct))
-			ThrowError($"User with email {req.Email} already exists", 400);
+			ThrowError(r=>r.Email,"User with this email already exists");
 		var user = req.MapUserCreateDtoToUser();
 		user.RoleName = Contracts.SupportedRoles.User;
 		await _context.AddAsync(user, ct);
