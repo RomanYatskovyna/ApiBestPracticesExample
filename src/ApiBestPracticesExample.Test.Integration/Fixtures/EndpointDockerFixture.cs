@@ -36,7 +36,7 @@ public class EndpointDockerFixture : DockerCollectionFixtureBase<IApiMarker>
 	}
 	public Task InitDatabaseAsync()
 	{
-		return Services.PerformDbPreparationAsync();
+		return Services.PerformDbPreparationAsync(true, false);
 	}
 	public Task ResetDatabaseAsync()
 	{

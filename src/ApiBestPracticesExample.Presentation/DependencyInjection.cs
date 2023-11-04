@@ -87,14 +87,16 @@ public static class DependencyInjection
 		});
 	}
 
-	public static async Task<IServiceProvider> PerformDbPreparationAsync(this IServiceProvider services, bool initData = true)
+	public static async Task<IServiceProvider> PerformDbPreparationAsync(this IServiceProvider services, bool initData = true, bool migrateDatabase = true)
 	{
 		await using var scope = services.CreateAsyncScope();
 		await using var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 		var logger = services.GetRequiredService<ILogger>();
-
-		await context.Database.MigrateAsync();
-		logger.Information("Database migrated successfully");
+		if (migrateDatabase)
+		{
+			await context.Database.MigrateAsync();
+			logger.Information("Database migrated successfully");
+		}
 		if (initData)
 		{
 			await context.SeedDataAsync(logger);
