@@ -10,6 +10,8 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Serilog;
 using StackExchange.Redis;
 using System.Reflection;
+using System.Text.Json;
+using Microsoft.AspNetCore.Http.Json;
 using Order = FastEndpoints.Order;
 
 namespace ApiBestPracticesExample.Presentation;
@@ -43,6 +45,14 @@ public static class DependencyInjection
 				swaggerConfig.ShortSchemaNames = true;
 			});
 		}
+
+		//services.AddAuthentication().AddGoogle(googleOptions =>
+		//{
+		//	googleOptions.ClientId = configuration["Authentication:Google:ClientId"];
+		//	googleOptions.ClientSecret = configuration["Authentication:Google:ClientSecret"];
+		//	googleOptions.CallbackPath = "/signin-google"; // Your callback path
+		//});
+		//;
 		services.AddAuthorization();
 		services.AddJWTBearerAuth(configuration.GetRequiredSection("Jwt").GetRequiredValue("AccessTokenSigningKey"), JWTBearer.TokenSigningStyle.Symmetric, v =>
 		{
@@ -56,7 +66,7 @@ public static class DependencyInjection
 	}
 	public static WebApplication UseDefaultServices(this WebApplication app)
 	{
-		//app.UseSerilogRequestLogging();
+		app.UseSerilogRequestLogging();
 		app.UseAuthentication();
 		app.UseAuthorization();
 		app.UseDefaultExceptionHandler();
@@ -83,12 +93,13 @@ public static class DependencyInjection
 				.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
 			if (isDevelopment)
 			{
-				options.EnableDetailedErrors().EnableSensitiveDataLogging();
+				options.EnableDetailedErrors()
+					.EnableSensitiveDataLogging();
 			}
 		});
 	}
 
-	public static async Task<IServiceProvider> PerformDbPreparationAsync(this IServiceProvider services, bool initData = true, bool migrateDatabase = true)
+	public static async Task<IServiceProvider> PerformDbPreparationAsync(this IServiceProvider services, bool migrateDatabase = true, bool initData = true, bool initDevelopmentData = true)
 	{
 		await using var scope = services.CreateAsyncScope();
 		await using var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -96,11 +107,14 @@ public static class DependencyInjection
 		if (migrateDatabase)
 		{
 			await context.Database.MigrateAsync();
-			logger.Information("Database migrated successfully");
 		}
 		if (initData)
 		{
-			await context.SeedDataAsync(logger);
+			await context.SeedDefaultDataAsync();
+			if (initDevelopmentData)
+			{
+				await context.SeedDevelopmentTestDataAsync();
+			}
 			logger.Information("Data seeded successfully");
 		}
 		return services;

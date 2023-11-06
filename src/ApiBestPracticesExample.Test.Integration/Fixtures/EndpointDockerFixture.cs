@@ -3,6 +3,7 @@ using DotNet.Testcontainers.Containers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Respawn;
+using Respawn.Graph;
 using Testcontainers.MsSql;
 using Testcontainers.Redis;
 
@@ -36,7 +37,7 @@ public class EndpointDockerFixture : DockerCollectionFixtureBase<IApiMarker>
 	}
 	public Task InitDatabaseAsync()
 	{
-		return Services.PerformDbPreparationAsync(true, false);
+		return Services.PerformDbPreparationAsync();
 	}
 	public Task ResetDatabaseAsync()
 	{
@@ -51,6 +52,10 @@ public class EndpointDockerFixture : DockerCollectionFixtureBase<IApiMarker>
 			SchemasToInclude = new[]
 			{
 				"dbo"
+			},
+			TablesToIgnore = new []
+			{
+				new Table("__EFMigrationsHistory")
 			},
 			DbAdapter = DbAdapter.SqlServer
 		});

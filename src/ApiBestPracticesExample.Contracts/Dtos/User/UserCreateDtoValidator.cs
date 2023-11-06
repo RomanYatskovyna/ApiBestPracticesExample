@@ -1,7 +1,6 @@
-﻿using ApiBestPracticesExample.Contracts.Dtos.User;
-using FluentValidation;
+﻿using FluentValidation;
 
-namespace ApiBestPracticesExample.Infrastructure.Validators;
+namespace ApiBestPracticesExample.Contracts.Dtos.User;
 
 public sealed class UserCreateDtoValidator : AbstractValidator<UserCreateDto>
 {
