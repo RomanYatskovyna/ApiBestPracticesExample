@@ -5,8 +5,8 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=https://+:443;http://+:80
-      - ConnectionStrings__SqlServer=sqlserver,1433;Database=testDb;User Id=sa;Password=Qwerty123$;
-      - ConnectionStrings__Redis=${REDIS_CONNECTION_STRING}
+      - ConnectionStrings__SqlConnection=Data Source=sqlserver; Database=testDb;User Id=sa;Password=Qwerty123$;TrustServerCertificate=True
+      - ConnectionStrings_RedisConnection=redis
     ports:
       - "80"
       - "443"

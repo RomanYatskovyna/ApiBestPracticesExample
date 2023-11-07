@@ -25,13 +25,13 @@ public class EndpointDockerFixture : DockerCollectionFixtureBase<IApiMarker>
 				.WithPortBinding(SqlContainerPort.ToString(), "1433")
 				.Build()
 		},
-		//{
-		//	nameof(RedisContainer),  new RedisBuilder()
-		//		.WithImage("redis:latest")
-		//		.WithName("TestRedisDatabase-" + RedisContainerPort)
-		//		.WithPortBinding(RedisContainerPort.ToString(), "6379")
-		//		.Build()
-		//}
+		{
+			nameof(RedisContainer),  new RedisBuilder()
+				.WithImage("redis:latest")
+				.WithName("TestRedisDatabase-" + RedisContainerPort)
+				.WithPortBinding(RedisContainerPort.ToString(), "6379")
+				.Build()
+		}
 	})
 	{
 	}

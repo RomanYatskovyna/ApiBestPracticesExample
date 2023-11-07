@@ -14,5 +14,5 @@ var conStr = builder.Configuration.GetRequiredConnectionString("SqlConnection");
 builder.Services.AddCustomDbContext<AppDbContext>(conStr, builder.Environment.IsDevelopment());
 var app = builder.Build();
 app.UseDefaultServices();
-await app.Services.PerformDbPreparationAsync(true,true,!app.Environment.IsProduction());
+await app.Services.PerformDbPreparationAsync(true, true, !app.Environment.IsProduction());
 await app.RunAsync();
