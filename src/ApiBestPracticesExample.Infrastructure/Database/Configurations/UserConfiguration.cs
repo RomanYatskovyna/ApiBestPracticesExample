@@ -3,8 +3,6 @@ using ApiBestPracticesExample.Domain.Entities;
 using ApiBestPracticesExample.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
 
 #nullable disable
 
@@ -15,6 +13,8 @@ namespace ApiBestPracticesExample.Infrastructure.Database.Configurations
         public void Configure(EntityTypeBuilder<User> entity)
         {
             entity.HasKey(e => e.Email).HasName("PK_NewTable");
+
+            entity.HasIndex(e => e.RoleName, "IX_Users_RoleName");
 
             entity.Property(e => e.Email).HasMaxLength(200);
             entity.Property(e => e.PasswordHash).HasMaxLength(200);

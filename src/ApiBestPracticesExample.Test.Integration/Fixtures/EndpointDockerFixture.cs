@@ -66,7 +66,7 @@ public class EndpointDockerFixture : DockerCollectionFixtureBase<IApiMarker>
 		services.RemoveAll(typeof(DbContextOptions<AppDbContext>));
 		services.RemoveAll(typeof(AppDbContext));
 		var sqlContainer = GetContainerByType<MsSqlContainer>();
-		services.AddCustomDbContext<AppDbContext>(sqlContainer.GetConnectionString(), true);
+		services.AddCustomDbContextPool<AppDbContext>(sqlContainer.GetConnectionString(), true);
 	}
 
 

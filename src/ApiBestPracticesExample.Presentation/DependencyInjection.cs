@@ -61,7 +61,7 @@ public static class DependencyInjection
 			v.ValidateIssuerSigningKey = true;
 		});
 
-		services.AddRedisOutputCache(configuration.GetRequiredConnectionString("RedisConnection"));
+		services.AddRedisOutputCache(configuration.GetConnectionString("RedisConnection"));
 		return services;
 	}
 	public static WebApplication UseDefaultServices(this WebApplication app)
@@ -84,9 +84,9 @@ public static class DependencyInjection
 		app.UseSwaggerGen();
 		return app;
 	}
-	public static IServiceCollection AddCustomDbContext<TContext>(this IServiceCollection services, string connectionString, bool isDevelopment) where TContext : DbContext
+	public static IServiceCollection AddCustomDbContextPool<TContext>(this IServiceCollection services, string connectionString, bool isDevelopment) where TContext : DbContext
 	{
-		return services.AddDbContext<TContext>(options =>
+		return services.AddDbContextPool<TContext>(options =>
 		{
 			options.UseSqlServer(connectionString, sqlServerOptions =>
 				sqlServerOptions.MigrationsAssembly("ApiBestPracticesExample.Infrastructure"))
@@ -122,7 +122,7 @@ public static class DependencyInjection
 	public static IServiceCollection AddRedisOutputCache(this IServiceCollection services, string? redisConStr)
 	{
 		services.AddOutputCache();
-		if (redisConStr is null)
+		if (string.IsNullOrEmpty(redisConStr))
 			return services;
 		services.RemoveAll<IOutputCacheStore>();
 		services.AddSingleton<IOutputCacheStore, RedisOutputCacheStore>();

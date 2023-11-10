@@ -1,7 +1,7 @@
 ﻿
 using ApiBestPracticesExample.Domain.Entities;
+using ApiBestPracticesExample.Infrastructure.Database.Configurations;
 using Microsoft.EntityFrameworkCore;
-
 namespace ApiBestPracticesExample.Infrastructure.Database;
 
 public partial class AppDbContext : DbContext
@@ -17,8 +17,7 @@ public partial class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-            modelBuilder.ApplyConfiguration(new Configurations.RoleConfiguration());
-            modelBuilder.ApplyConfiguration(new Configurations.UserConfiguration());
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
 
         OnModelCreatingGeneratedProcedures(modelBuilder);
         OnModelCreatingGeneratedFunctions(modelBuilder);

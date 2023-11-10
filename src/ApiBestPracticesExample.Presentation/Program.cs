@@ -11,7 +11,7 @@ builder.Services.AddDefaultServices(builder.Configuration, new List<Assembly>
 	typeof(CreateUserEndpointV1).Assembly
 }, Enum.GetValues<ApiSupportedVersions>().Select(version => (int)version).ToList());
 var conStr = builder.Configuration.GetRequiredConnectionString("SqlConnection");
-builder.Services.AddCustomDbContext<AppDbContext>(conStr, builder.Environment.IsDevelopment());
+builder.Services.AddCustomDbContextPool<AppDbContext>(conStr, builder.Environment.IsDevelopment());
 var app = builder.Build();
 app.UseDefaultServices();
 await app.Services.PerformDbPreparationAsync(true, true, !app.Environment.IsProduction());

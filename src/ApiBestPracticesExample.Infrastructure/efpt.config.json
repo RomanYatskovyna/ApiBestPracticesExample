@@ -37,6 +37,7 @@
    "UseLegacyPluralizer": false,
    "UseManyToManyEntity": true,
    "UseNoDefaultConstructor": true,
+   "UseNoNavigations": false,
    "UseNoObjectFilter": true,
    "UseNodaTime": false,
    "UseNullableReferences": true,
