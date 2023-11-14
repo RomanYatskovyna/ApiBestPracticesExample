@@ -1,11 +1,6 @@
-﻿using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ApiBestPracticesExample.Infrastructure.Endpoints.Authentication.V1;
 public class GoogleCallbackEndpoint : EndpointWithoutRequest
@@ -14,6 +9,7 @@ public class GoogleCallbackEndpoint : EndpointWithoutRequest
 	{
 		Get("authentication/signin-google-callback");
 		AllowAnonymous();
+		Version((int)ApiSupportedVersions.V1);
 	}
 
 	public override async Task HandleAsync(CancellationToken ct)

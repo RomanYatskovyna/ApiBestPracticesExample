@@ -13,6 +13,8 @@ using System.Reflection;
 using System.Text.Json;
 using Microsoft.AspNetCore.Http.Json;
 using Order = FastEndpoints.Order;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 
 namespace ApiBestPracticesExample.Presentation;
 
@@ -46,15 +48,16 @@ public static class DependencyInjection
 			});
 		}
 
-		//services.AddAuthentication().AddGoogle(googleOptions =>
-		//{
-		//	googleOptions.ClientId = configuration["Authentication:Google:ClientId"];
-		//	googleOptions.ClientSecret = configuration["Authentication:Google:ClientSecret"];
-		//	googleOptions.CallbackPath = "/signin-google"; // Your callback path
-		//});
-		//;
+		services.AddAuthentication().AddGoogle(googleOptions =>
+		{
+			var googleSection = configuration.GetRequiredSection("Authentication:Google");
+			googleOptions.ClientId = googleSection.GetRequiredValue("ClientId");
+			googleOptions.ClientSecret = googleSection.GetRequiredValue("ClientSecret");
+			googleOptions.CallbackPath = "/authentication/signin-google-callback"; // Your callback path
+		});
+		
 		services.AddAuthorization();
-		services.AddJWTBearerAuth(configuration.GetRequiredSection("Jwt").GetRequiredValue("AccessTokenSigningKey"), JWTBearer.TokenSigningStyle.Symmetric, v =>
+		services.AddJWTBearerAuth(configuration.GetRequiredSection("Authentication:Jwt").GetRequiredValue("AccessTokenSigningKey"), JWTBearer.TokenSigningStyle.Symmetric, v =>
 		{
 			v.ClockSkew = TimeSpan.FromSeconds(30);
 			v.ValidateLifetime = true;
@@ -64,12 +67,8 @@ public static class DependencyInjection
 		services.AddRedisOutputCache(configuration.GetConnectionString("RedisConnection"));
 		return services;
 	}
-	public static WebApplication UseDefaultServices(this WebApplication app)
+	public static WebApplication UseDefaultFastEndpoints(this WebApplication app)
 	{
-		app.UseSerilogRequestLogging();
-		app.UseAuthentication();
-		app.UseAuthorization();
-		app.UseDefaultExceptionHandler();
 		app.UseFastEndpoints(config =>
 		{
 			config.Endpoints.Configurator = ep =>
@@ -81,7 +80,6 @@ public static class DependencyInjection
 			config.Versioning.Prefix = "v";
 			config.Versioning.PrependToRoute = true;
 		});
-		app.UseSwaggerGen();
 		return app;
 	}
 	public static IServiceCollection AddCustomDbContextPool<TContext>(this IServiceCollection services, string connectionString, bool isDevelopment) where TContext : DbContext
@@ -99,7 +97,7 @@ public static class DependencyInjection
 		});
 	}
 
-	public static async Task<IServiceProvider> PerformDbPreparationAsync(this IServiceProvider services, bool migrateDatabase = true, bool initData = true, bool initDevelopmentData = true)
+	public static async Task<IServiceProvider> PrepareDbAsync(this IServiceProvider services, bool migrateDatabase = true, bool initData = true, bool initDevelopmentData = true)
 	{
 		await using var scope = services.CreateAsyncScope();
 		await using var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();

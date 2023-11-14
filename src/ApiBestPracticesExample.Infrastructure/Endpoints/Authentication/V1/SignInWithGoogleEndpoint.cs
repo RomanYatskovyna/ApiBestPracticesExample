@@ -8,14 +8,16 @@ public sealed class SignInWithGoogleEndpoint : EndpointWithoutRequest
 	{
 		Get("authentication/signin-google");
 		AllowAnonymous();
+		Version((int)ApiSupportedVersions.V1);
 	}
 
 	public override Task HandleAsync(CancellationToken ct)
 	{
 		var authenticationProperties = new AuthenticationProperties
 		{
-			RedirectUri = "authentication/signin-google-callback" // The URL to redirect to after authentication
+			RedirectUri = "authentication/signin-google-callback"
 		};
+
 		return HttpContext.ChallengeAsync(GoogleDefaults.AuthenticationScheme, authenticationProperties);
 	}
 }

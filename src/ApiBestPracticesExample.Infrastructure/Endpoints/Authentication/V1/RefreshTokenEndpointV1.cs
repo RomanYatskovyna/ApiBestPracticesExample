@@ -2,7 +2,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System.Security.Claims;
+using ApiBestPracticesExample.Domain.Entities;
 using Microsoft.AspNetCore.Http;
+using Azure.Core;
 
 namespace ApiBestPracticesExample.Infrastructure.Endpoints.Authentication.V1;
 
@@ -12,12 +14,12 @@ public sealed class RefreshTokenEndpointV1 : RefreshTokenService<TokenRequest, T
 	public RefreshTokenEndpointV1(IConfiguration config, AppDbContext context)
 	{
 		_context = context;
-		var jwtSection = config.GetRequiredSection("Jwt");
+		var jwtSection = config.GetRequiredSection("Authentication:Jwt");
 		var signingKey = jwtSection["AccessTokenSigningKey"];
 		if (signingKey is null)
 			throw new ArgumentNullException("AccessTokenSigningKey is null");
 		if (signingKey.Length < 128)
-			throw new ArgumentOutOfRangeException("AccessTokenSigningKey must be more than 128 symbols");
+			throw new ArgumentOutOfRangeException(paramName: "AccessTokenSigningKey must be more than 128 symbols");
 		Setup(o =>
 		{
 			o.TokenSigningKey = jwtSection["AccessTokenSigningKey"];
