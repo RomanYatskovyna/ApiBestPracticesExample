@@ -3,8 +3,6 @@ using ApiBestPracticesExample.Domain.Entities;
 using ApiBestPracticesExample.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
 
 #nullable disable
 

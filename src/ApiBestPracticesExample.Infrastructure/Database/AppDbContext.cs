@@ -1,7 +1,7 @@
 ﻿
 using ApiBestPracticesExample.Domain.Entities;
+using ApiBestPracticesExample.Infrastructure.Database.Configurations;
 using Microsoft.EntityFrameworkCore;
-
 namespace ApiBestPracticesExample.Infrastructure.Database;
 
 public partial class AppDbContext : DbContext
@@ -11,14 +11,14 @@ public partial class AppDbContext : DbContext
     {
     }
 
-    public virtual DbSet<Role> Roles { get; set; }
+    public virtual required DbSet<Role> Roles { get; set; }
 
-    public virtual DbSet<User> Users { get; set; }
+    public virtual required DbSet<User> Users { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-            modelBuilder.ApplyConfiguration(new Configurations.RoleConfiguration());
-            modelBuilder.ApplyConfiguration(new Configurations.UserConfiguration());
+        modelBuilder.ApplyConfiguration(new Configurations.RoleConfiguration());
+        modelBuilder.ApplyConfiguration(new Configurations.UserConfiguration());
 
         OnModelCreatingGeneratedProcedures(modelBuilder);
         OnModelCreatingGeneratedFunctions(modelBuilder);
