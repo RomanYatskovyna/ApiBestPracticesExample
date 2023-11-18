@@ -99,7 +99,7 @@ public abstract class DockerCollectionFixtureBase<TProgram> : BaseFixture, IAsyn
         var dockerTasks = _dockerContainers.Select(container => container.Value.StartAsync()).ToArray();
         await Task.WhenAll(dockerTasks);
         _app = (WebApplicationFactory<TProgram>)
-            _appCache.GetOrAdd(
+            AppCache.GetOrAdd(
                 GetType(),
                 _ => new WebApplicationFactory<TProgram>().WithWebHostBuilder(b =>
                 {
