@@ -47,14 +47,6 @@ public static class DependencyInjection
 				swaggerConfig.ShortSchemaNames = true;
 			});
 		}
-
-		services.AddAuthentication().AddGoogle(googleOptions =>
-		{
-			var googleSection = configuration.GetRequiredSection("Authentication:Google");
-			googleOptions.ClientId = googleSection.GetRequiredValue("ClientId");
-			googleOptions.ClientSecret = googleSection.GetRequiredValue("ClientSecret");
-			googleOptions.CallbackPath = "/authentication/signin-google-callback"; // Your callback path
-		});
 		
 		services.AddAuthorization();
 		services.AddJWTBearerAuth(configuration.GetRequiredSection("Authentication:Jwt").GetRequiredValue("AccessTokenSigningKey"), JWTBearer.TokenSigningStyle.Symmetric, v =>
