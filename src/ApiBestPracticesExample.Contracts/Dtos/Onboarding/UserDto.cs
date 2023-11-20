@@ -1,4 +1,4 @@
-﻿namespace ApiBestPracticesExample.Contracts.Dtos.User;
+﻿namespace ApiBestPracticesExample.Contracts.Dtos.Onboarding;
 
 public class UserDto
 {

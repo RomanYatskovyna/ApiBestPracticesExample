@@ -1,7 +1,6 @@
 ﻿using ApiBestPracticesExample.Contracts;
 using ApiBestPracticesExample.Domain.Entities;
 using ApiBestPracticesExample.Infrastructure.Services;
-using Microsoft.EntityFrameworkCore;
 using Polly;
 using System.Reflection;
 
@@ -12,18 +11,10 @@ public static class AppDbContextSeeder
 	public const string DefaultAdminPassword = "Qwerty123$";
 
 
-	public static readonly User DefaultAdmin = new()
-	{
-		Email = "ReadOnlyAdmin@gmail.com",
-		PasswordHash = PasswordEncrypter.HashPassword(DefaultAdminPassword),
-		RoleName = SupportedRoles.Admin
-	};
-	public static readonly User DefaultUser = new()
-	{
-		Email = "ReadOnlyUser@gmail.com",
-		PasswordHash = PasswordEncrypter.HashPassword(DefaultUserPassword),
-		RoleName = SupportedRoles.User
-	};
+	public static User DefaultAdmin { get; private set; } = null!;
+
+	public static User DefaultUser { get; private set; } = null!;
+
 	public static async Task SeedDefaultDataAsync(this AppDbContext context)
 	{
 		await SeedRolesAsync(context);
@@ -31,10 +22,23 @@ public static class AppDbContextSeeder
 
 	public static async Task SeedDevelopmentTestDataAsync(this AppDbContext context)
 	{
-
-		DefaultAdmin.RoleNameNavigation = null;
-		DefaultUser.RoleNameNavigation = null;
-		await SeedEntityAsync(context,DefaultAdmin, DefaultUser);
+		User defaultAdmin = new()
+		{
+			UserName = "ReadOnlyAdmin@gmail.com",
+			Email = "ReadOnlyAdmin@gmail.com",
+			PasswordHash = PasswordEncrypter.HashPassword(DefaultAdminPassword),
+			RoleName = SupportedRoles.Admin
+		}, defaultUser = new() 
+		{
+			PhoneNumber = "+1 408-555-1234",
+			UserName = "ReadOnlyUser@gmail.com",
+			Email = "ReadOnlyUser@gmail.com",
+			PasswordHash = PasswordEncrypter.HashPassword(DefaultUserPassword),
+			RoleName = SupportedRoles.User
+		};
+		await SeedEntityAsync(context,defaultAdmin, defaultUser);
+		DefaultAdmin=defaultAdmin;
+		DefaultUser=defaultUser;
 	}
 	private static async Task SeedEntityAsync<TEntity>(DbContext context, params TEntity[] data) where TEntity : class
 	{
@@ -43,7 +47,6 @@ public static class AppDbContextSeeder
 		{
 			await set.AddRangeAsync(data);
 			await context.SaveChangesAsync();
-			context.ChangeTracker.Clear();
 		}
 	}
 	private static async Task SeedRolesAsync(AppDbContext context)

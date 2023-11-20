@@ -3,21 +3,15 @@ using ApiBestPracticesExample.Infrastructure.Database;
 using FastEndpoints;
 using FastEndpoints.Security;
 using FastEndpoints.Swagger;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Serilog;
 using StackExchange.Redis;
 using System.Reflection;
-using System.Text.Json;
-using Microsoft.AspNetCore.Http.Json;
 using Order = FastEndpoints.Order;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 
 namespace ApiBestPracticesExample.Presentation;
-
 public static class DependencyInjection
 {
 	public static IServiceCollection AddDefaultServices(this IServiceCollection services, IConfiguration configuration, List<Assembly> endpointAssemblies, List<int> supportedVersions)
@@ -47,7 +41,7 @@ public static class DependencyInjection
 				swaggerConfig.ShortSchemaNames = true;
 			});
 		}
-		
+
 		services.AddAuthorization();
 		services.AddJWTBearerAuth(configuration.GetRequiredSection("Authentication:Jwt").GetRequiredValue("AccessTokenSigningKey"), JWTBearer.TokenSigningStyle.Symmetric, v =>
 		{
@@ -79,7 +73,7 @@ public static class DependencyInjection
 		return services.AddDbContextPool<TContext>(options =>
 		{
 			options.UseSqlServer(connectionString, sqlServerOptions =>
-				sqlServerOptions.MigrationsAssembly("ApiBestPracticesExample.Infrastructure"))
+				sqlServerOptions.MigrationsAssembly("ApiBestPracticesExample.Infrastructure").UseDateOnlyTimeOnly())
 				.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
 			if (isDevelopment)
 			{

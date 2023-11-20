@@ -1,6 +1,4 @@
-﻿using ApiBestPracticesExample.Infrastructure.Database;
-using ApiBestPracticesExample.Infrastructure.Services;
-using Microsoft.EntityFrameworkCore;
+﻿using ApiBestPracticesExample.Infrastructure.Services;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 

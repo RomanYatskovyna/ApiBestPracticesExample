@@ -1,4 +1,4 @@
-﻿using ApiBestPracticesExample.Contracts.Dtos.User;
+﻿using ApiBestPracticesExample.Contracts.Dtos.Onboarding;
 using ApiBestPracticesExample.Domain.Entities;
 using ApiBestPracticesExample.Infrastructure.Services;
 using Riok.Mapperly.Abstractions;

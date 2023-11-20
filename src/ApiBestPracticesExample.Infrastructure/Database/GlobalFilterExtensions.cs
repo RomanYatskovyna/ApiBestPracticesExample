@@ -4,7 +4,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 
 namespace ApiBestPracticesExample.Infrastructure.Database;
 public static class GlobalFilterExtensions

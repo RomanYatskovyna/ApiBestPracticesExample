@@ -24,7 +24,7 @@
          "ObjectType": 0
       }
    ],
-   "UiHint": "rusty.UserServiceDb.dbo",
+   "UiHint": "rusty.UserServiceAlterDb.dbo",
    "UncountableWords": null,
    "UseBoolPropertiesWithoutDefaultSql": false,
    "UseDatabaseNames": false,

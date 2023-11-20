@@ -1,7 +1,7 @@
 ﻿
 using ApiBestPracticesExample.Domain.Entities;
 using ApiBestPracticesExample.Infrastructure.Database.Configurations;
-using Microsoft.EntityFrameworkCore;
+
 namespace ApiBestPracticesExample.Infrastructure.Database;
 
 public partial class AppDbContext : DbContext
