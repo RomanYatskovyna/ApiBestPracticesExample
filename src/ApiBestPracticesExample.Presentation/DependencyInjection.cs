@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Serilog;
 using StackExchange.Redis;
 using System.Reflection;
+using System.Text.Json.Serialization;
 using Order = FastEndpoints.Order;
 
 namespace ApiBestPracticesExample.Presentation;
@@ -59,6 +60,7 @@ public static class DependencyInjection
 	{
 		app.UseFastEndpoints(config =>
 		{
+			config.Serializer.Options.Converters.Add(new JsonStringEnumConverter());
 			config.Endpoints.Configurator = ep =>
 			{
 				ep.PostProcessors(Order.After, new ErrorLogger());
