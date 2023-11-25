@@ -1,6 +1,8 @@
-﻿using ApiBestPracticesExample.Infrastructure.Caching;
+﻿using ApiBestPracticesExample.Infrastructure;
+using ApiBestPracticesExample.Infrastructure.Caching;
 using ApiBestPracticesExample.Infrastructure.Database;
 using FastEndpoints;
+using FastEndpoints.ClientGen;
 using FastEndpoints.Security;
 using FastEndpoints.Swagger;
 using Microsoft.AspNetCore.OutputCaching;
@@ -81,6 +83,27 @@ public static class DependencyInjection
 					.EnableSensitiveDataLogging();
 			}
 		});
+	}
+
+	public static WebApplication UseClientGen(this WebApplication app,List<int> supportedVersions)
+	{
+		foreach (var version in supportedVersions)
+		{
+
+			var versionString = $"v{version}";
+			app.MapCSharpClientEndpoint($"api/v{version}/cs-client", versionString, s =>
+			{
+				s.ClassName = $"ApiClient{versionString.ToUpper()}";
+				s.CSharpGeneratorSettings.Namespace = "";
+			});
+			app.MapTypeScriptClientEndpoint($"api/v{version}/ts-client", versionString, s =>
+			{
+				s.ClassName = $"ApiClient{versionString.ToUpper()}";
+				s.TypeScriptGeneratorSettings.Namespace = "Namespace";
+			});
+		}
+
+		return app;
 	}
 
 	public static async Task<IServiceProvider> PrepareDbAsync(this IServiceProvider services, bool migrateDatabase = true, bool initData = true, bool initDevelopmentData = true)

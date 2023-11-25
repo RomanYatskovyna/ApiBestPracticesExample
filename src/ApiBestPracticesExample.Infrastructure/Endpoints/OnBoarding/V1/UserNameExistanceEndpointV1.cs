@@ -5,7 +5,8 @@ public sealed class UserNameExistenceEndpointV1 : Endpoint<string, bool>
 
 	public override void Configure()
 	{
-		Post("onboarding/validate-user-name");
+		Post("onboarding/validate-user-name-uniqueness");
+		AllowAnonymous();
 		Description(d => { d.WithDisplayName("ValidateEmail"); });
 		Summary(s =>
 		{

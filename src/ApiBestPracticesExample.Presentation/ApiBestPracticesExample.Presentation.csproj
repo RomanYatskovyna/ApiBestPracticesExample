@@ -9,6 +9,7 @@
     <DockerComposeProjectPath>..\docker-compose.dcproj</DockerComposeProjectPath>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="FastEndpoints.ClientGen" Version="5.19.2" />
     <PackageReference Include="FastEndpoints.Security" Version="5.19.2" />
     <PackageReference Include="FastEndpoints.Swagger" Version="5.19.2" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.0" />

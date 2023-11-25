@@ -5,7 +5,8 @@ public sealed class EmailExistenceEndpointV1 : Endpoint<string, bool>
 
 	public override void Configure()
 	{
-		Post("onboarding/validate-email");
+		Post("onboarding/validate-email-uniqueness");
+		AllowAnonymous();
 		Description(d => { d.WithDisplayName("ValidateEmail"); });
 		Summary(s =>
 		{

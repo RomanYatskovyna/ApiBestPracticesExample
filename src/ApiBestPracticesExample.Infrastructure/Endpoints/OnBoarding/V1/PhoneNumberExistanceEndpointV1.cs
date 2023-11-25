@@ -5,7 +5,8 @@ public sealed class PhoneNumberExistenceEndpointV1 : Endpoint<string, bool>
 
 	public override void Configure()
 	{
-		Post("onboarding/validate-phone-number");
+		Post("onboarding/validate-phone-number-uniqueness");
+		AllowAnonymous();
 		Description(d => { d.WithDisplayName("ValidateEmail"); });
 		Summary(s =>
 		{

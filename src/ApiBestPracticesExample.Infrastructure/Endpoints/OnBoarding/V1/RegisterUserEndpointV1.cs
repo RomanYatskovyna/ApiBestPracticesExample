@@ -9,6 +9,7 @@ public sealed class RegisterUserEndpointV1 : Endpoint<UserCreateDto, UserDto>
 	public override void Configure()
 	{
 		Post("onboarding/register");
+		AllowAnonymous();
 		Description(d => { d.WithDisplayName("RegisterUser"); });
 		Summary(s =>
 		{
