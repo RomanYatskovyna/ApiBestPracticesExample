@@ -1,7 +1,6 @@
 ﻿using ApiBestPracticesExample.Contracts;
 using ApiBestPracticesExample.Domain.Entities;
 using ApiBestPracticesExample.Infrastructure.Services;
-using Polly;
 using System.Reflection;
 
 namespace ApiBestPracticesExample.Infrastructure.Database;

@@ -3,7 +3,6 @@ using ApiBestPracticesExample.Infrastructure.Database;
 using ApiBestPracticesExample.Infrastructure.Endpoints.Authentication.V1;
 using ApiBestPracticesExample.Presentation;
 using FastEndpoints;
-using FastEndpoints.ClientGen;
 using FastEndpoints.Swagger;
 using Serilog;
 using System.Reflection;

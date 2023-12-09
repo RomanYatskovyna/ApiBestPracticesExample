@@ -1,6 +1,5 @@
 ﻿
 using ApiBestPracticesExample.Domain.Entities;
-using ApiBestPracticesExample.Infrastructure.Database.Configurations;
 
 namespace ApiBestPracticesExample.Infrastructure.Database;
 

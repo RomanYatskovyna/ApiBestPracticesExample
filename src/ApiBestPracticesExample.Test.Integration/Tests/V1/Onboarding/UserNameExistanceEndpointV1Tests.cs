@@ -1,12 +1,7 @@
 ﻿using ApiBestPracticesExample.Infrastructure.Endpoints.OnBoarding.V1;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ApiBestPracticesExample.Test.Integration.Tests.V1.Onboarding;
+[Collection("DockerCollection")]
 public sealed class UserNameExistenceEndpointV1Tests:BaseTest
 {
 	[Fact]

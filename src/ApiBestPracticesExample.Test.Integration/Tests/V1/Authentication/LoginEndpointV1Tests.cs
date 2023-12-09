@@ -1,7 +1,8 @@
-﻿using System.Net;
+﻿using System.Security.Claims;
 using ApiBestPracticesExample.Infrastructure.Endpoints.Authentication.V1;
 
 namespace ApiBestPracticesExample.Test.Integration.Tests.V1.Authentication;
+[Collection("DockerCollection")]
 public sealed class LoginEndpointV1Tests : BaseTest
 {
 	[Fact]
@@ -22,7 +23,7 @@ public sealed class LoginEndpointV1Tests : BaseTest
 
 		var claims = ParseClaimsFromJwt(res.AccessToken);
 		claims.Should().Contain(c => c.Type=="role" && c.Value == dbUser.RoleName);
-		claims.Should().Contain(c => c.Type == "email" && c.Value == dbUser.Email);
+		claims.Should().Contain(c => c.Type == ClaimTypes.Email && c.Value == dbUser.Email);
 	}
 	[Fact]
 	public async Task Returns_200Token_When_UserExists()
@@ -42,7 +43,7 @@ public sealed class LoginEndpointV1Tests : BaseTest
 
 		var claims = ParseClaimsFromJwt(res.AccessToken);
 		claims.Should().Contain(c => c.Type == "role" && c.Value == dbUser.RoleName);
-		claims.Should().Contain(c => c.Type == "email" && c.Value == dbUser.Email);
+		claims.Should().Contain(c => c.Type == ClaimTypes.Email && c.Value == dbUser.Email);
 	}
 
 	[Fact]

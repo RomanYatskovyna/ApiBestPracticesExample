@@ -1,19 +1,16 @@
 ﻿using FastEndpoints;
-using FluentValidation.Results;
 
 namespace ApiBestPracticesExample.Presentation;
 
 public class ErrorLogger : IGlobalPostProcessor
 {
-	public Task PostProcessAsync(object req, object? res, HttpContext ctx,
-		IReadOnlyCollection<ValidationFailure> failures, CancellationToken ct)
+	public Task PostProcessAsync(IPostProcessorContext context, CancellationToken ct)
 	{
-		if (failures.Count > 0)
+		if (context.HasValidationFailures)
 		{
-			var logger = ctx.Resolve<ILogger>();
-			logger.Warning("Validation error count: {Count}", failures.Count);
+			var logger = context.HttpContext.Resolve<ILogger>();
+			logger.Warning("Validation error count: {Count}", context.ValidationFailures.Count);
 		}
-
 		return Task.CompletedTask;
 	}
 }

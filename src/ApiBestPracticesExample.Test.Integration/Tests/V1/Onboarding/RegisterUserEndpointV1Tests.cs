@@ -1,11 +1,8 @@
-﻿using System.Net;
-using System.Net.Http.Json;
-using ApiBestPracticesExample.Contracts.Dtos.Onboarding;
+﻿using ApiBestPracticesExample.Contracts.Dtos.Onboarding;
 using ApiBestPracticesExample.Infrastructure.Endpoints.OnBoarding.V1;
-using FluentAssertions.Execution;
-using Microsoft.AspNetCore.Mvc;
 
 namespace ApiBestPracticesExample.Test.Integration.Tests.V1.Onboarding;
+[Collection("DockerCollection")]
 public sealed class RegisterUserEndpointV1Tests : BaseTest
 {
 	[Fact]

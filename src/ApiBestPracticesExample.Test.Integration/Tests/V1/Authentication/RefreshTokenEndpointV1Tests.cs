@@ -1,9 +1,8 @@
-﻿using ApiBestPracticesExample.Infrastructure.Endpoints.Authentication.V1;
-using Microsoft.AspNetCore.Mvc;
-using System.Net;
+﻿using System.Security.Claims;
+using ApiBestPracticesExample.Infrastructure.Endpoints.Authentication.V1;
 
 namespace ApiBestPracticesExample.Test.Integration.Tests.V1.Authentication;
-
+[Collection("DockerCollection")]
 public sealed class RefreshTokenEndpointV1Tests : BaseTest
 {
 	[Fact]
@@ -29,7 +28,7 @@ public sealed class RefreshTokenEndpointV1Tests : BaseTest
 
 		var claims = ParseClaimsFromJwt(res.AccessToken);
 		claims.Should().Contain(c => c.Type == "role" && c.Value == dbUser.RoleName);
-		claims.Should().Contain(c => c.Type == "email" && c.Value == dbUser.Email);
+		claims.Should().Contain(c => c.Type == ClaimTypes.Email && c.Value == dbUser.Email);
 	}
 	[Fact]
 	public async Task Returns_404UserNotFound_When_UserIdIsMissing()

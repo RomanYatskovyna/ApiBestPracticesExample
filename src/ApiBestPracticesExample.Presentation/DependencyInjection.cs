@@ -1,5 +1,4 @@
-﻿using ApiBestPracticesExample.Infrastructure;
-using ApiBestPracticesExample.Infrastructure.Caching;
+﻿using ApiBestPracticesExample.Infrastructure.Caching;
 using ApiBestPracticesExample.Infrastructure.Database;
 using FastEndpoints;
 using FastEndpoints.ClientGen;

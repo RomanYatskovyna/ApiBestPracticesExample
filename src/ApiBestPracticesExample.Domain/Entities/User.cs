@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ApiBestPracticesExample.Domain.Entities;
+﻿namespace ApiBestPracticesExample.Domain.Entities;
 
 public partial class User
 {

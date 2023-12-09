@@ -1,8 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using System.Security.Claims;
-using ApiBestPracticesExample.Domain.Entities;
 using Microsoft.AspNetCore.Http;
-using Azure.Core;
 
 namespace ApiBestPracticesExample.Infrastructure.Endpoints.Authentication.V1;
 

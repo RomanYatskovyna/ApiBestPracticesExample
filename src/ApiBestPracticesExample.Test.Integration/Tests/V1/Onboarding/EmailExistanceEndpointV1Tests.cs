@@ -1,7 +1,7 @@
-﻿using System.Net;
-using ApiBestPracticesExample.Infrastructure.Endpoints.OnBoarding.V1;
+﻿using ApiBestPracticesExample.Infrastructure.Endpoints.OnBoarding.V1;
 
 namespace ApiBestPracticesExample.Test.Integration.Tests.V1.Onboarding;
+[Collection("DockerCollection")]
 public sealed class EmailExistenceEndpointV1Tests : BaseTest
 {
 	[Fact]

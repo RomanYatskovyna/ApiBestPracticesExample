@@ -29,7 +29,7 @@ public abstract class DockerCollectionFixtureBase<TProgram> : BaseFixture, IAsyn
         _dockerContainers = dockerContainers;
     }
     /// <inheritdoc/>>
-    public Faker Fake => _faker;
+    public Faker Fake => Faker;
 
     /// <summary>
     /// the service provider of the bootstrapped web application
