@@ -9,7 +9,7 @@ public sealed class PhoneNumberExistenceEndpointV1Tests:BaseTest
 	{
 		//Arrange
 		//Act
-		var (rsp, res) = await Admin.POSTAsync<PhoneNumberExistenceEndpointV1, string, bool>(AppDbContextSeeder.DefaultUser.PhoneNumber!);
+		var (rsp, res) = await Anonymous.POSTAsync<PhoneNumberExistenceEndpointV1, string, bool>(AppDbContextSeeder.DefaultUser.PhoneNumber!);
 
 		//Assert
 		rsp.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -20,7 +20,7 @@ public sealed class PhoneNumberExistenceEndpointV1Tests:BaseTest
 	{
 		//Arrange
 		//Act
-		var (rsp, res) = await Admin.POSTAsync<PhoneNumberExistenceEndpointV1, string, bool>(Fixture.Fake.Phone.PhoneNumber("(###) ###-####"));
+		var (rsp, res) = await Anonymous.POSTAsync<PhoneNumberExistenceEndpointV1, string, bool>(Fixture.Fake.Phone.PhoneNumber("(###) ###-####"));
 
 		//Assert
 		rsp.StatusCode.Should().Be(HttpStatusCode.OK);

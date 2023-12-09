@@ -9,7 +9,7 @@ public sealed class UserNameExistenceEndpointV1Tests:BaseTest
 	{
 		//Arrange
 		//Act
-		var (rsp, res) = await Admin.POSTAsync<UserNameExistenceEndpointV1, string, bool>(AppDbContextSeeder.DefaultUser.UserName);
+		var (rsp, res) = await Anonymous.POSTAsync<UserNameExistenceEndpointV1, string, bool>(AppDbContextSeeder.DefaultUser.UserName);
 		//Assert
 		rsp.StatusCode.Should().Be(HttpStatusCode.OK);
 		res.Should().BeTrue();
@@ -19,7 +19,7 @@ public sealed class UserNameExistenceEndpointV1Tests:BaseTest
 	{
 		//Arrange
 		//Act
-		var (rsp, res) = await Admin.POSTAsync<UserNameExistenceEndpointV1, string, bool>(Fixture.Fake.Internet.UserName());
+		var (rsp, res) = await Anonymous.POSTAsync<UserNameExistenceEndpointV1, string, bool>(Fixture.Fake.Internet.UserName());
 		//Assert
 		rsp.StatusCode.Should().Be(HttpStatusCode.OK);
 		res.Should().BeFalse();

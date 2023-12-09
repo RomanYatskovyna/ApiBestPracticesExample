@@ -9,7 +9,7 @@ public sealed class EmailExistenceEndpointV1Tests : BaseTest
 	{
 		//Arrange
 		//Act
-		var (rsp, res) = await Admin.POSTAsync<EmailExistenceEndpointV1, string, bool>(AppDbContextSeeder.DefaultUser.Email);
+		var (rsp, res) = await Anonymous.POSTAsync<EmailExistenceEndpointV1, string, bool>(AppDbContextSeeder.DefaultUser.Email);
 
 		//Assert
 		rsp.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -20,7 +20,7 @@ public sealed class EmailExistenceEndpointV1Tests : BaseTest
 	{
 		//Arrange
 		//Act
-		var (rsp, res) = await Admin.POSTAsync<EmailExistenceEndpointV1, string, bool>(Fixture.Fake.Internet.Email());
+		var (rsp, res) = await Anonymous.POSTAsync<EmailExistenceEndpointV1, string, bool>(Fixture.Fake.Internet.Email());
 
 		//Assert
 		rsp.StatusCode.Should().Be(HttpStatusCode.OK);

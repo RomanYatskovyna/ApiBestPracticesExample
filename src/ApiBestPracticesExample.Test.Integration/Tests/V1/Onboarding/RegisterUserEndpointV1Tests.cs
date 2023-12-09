@@ -36,7 +36,7 @@ public sealed class RegisterUserEndpointV1Tests : BaseTest
 			Password = "w"
 		};
 		//Act
-		var (rsp, res) = await Admin.POSTAsync<RegisterUserEndpointV1, UserCreateDto, ValidationProblemDetails>(request);
+		var (rsp, res) = await Anonymous.POSTAsync<RegisterUserEndpointV1, UserCreateDto, ValidationProblemDetails>(request);
 		//Assert
 		rsp.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 		res.Errors.Should().ContainKeys("email", "password","phoneNumber","userName");
@@ -53,7 +53,7 @@ public sealed class RegisterUserEndpointV1Tests : BaseTest
 			Password = AppDbContextSeeder.DefaultUserPassword
 		};
 		//Act
-		var (rsp, res) = await Admin.POSTAsync<RegisterUserEndpointV1, UserCreateDto, ValidationProblemDetails>(request);
+		var (rsp, res) = await Anonymous.POSTAsync<RegisterUserEndpointV1, UserCreateDto, ValidationProblemDetails>(request);
 		//Assert
 		rsp.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 		using var scope = new AssertionScope();
