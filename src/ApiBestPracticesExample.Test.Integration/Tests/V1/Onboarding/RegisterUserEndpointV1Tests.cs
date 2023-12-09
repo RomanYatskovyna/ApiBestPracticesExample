@@ -61,7 +61,7 @@ public sealed class RegisterUserEndpointV1Tests : BaseTest
 		res.Errors.Should().ContainKey("userName").WhoseValue.Should().Contain("User with this userName already exists");
 		res.Errors.Should().ContainKey("phoneNumber").WhoseValue.Should().Contain("User with this phoneNumber already exists");
 	}
-	public RegisterUserEndpointV1Tests(EndpointDockerFixture fixture, ITestOutputHelper outputHelper) : base(fixture, outputHelper)
+	public RegisterUserEndpointV1Tests(ApiFixture fixture) : base(fixture)
 	{
 	}
 }

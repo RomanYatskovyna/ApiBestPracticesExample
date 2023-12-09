@@ -24,7 +24,7 @@ public sealed class UserNameExistenceEndpointV1Tests:BaseTest
 		rsp.StatusCode.Should().Be(HttpStatusCode.OK);
 		res.Should().BeFalse();
 	}
-	public UserNameExistenceEndpointV1Tests(EndpointDockerFixture fixture, ITestOutputHelper outputHelper) : base(fixture, outputHelper)
+	public UserNameExistenceEndpointV1Tests(ApiFixture fixture) : base(fixture)
 	{
 	}
 }

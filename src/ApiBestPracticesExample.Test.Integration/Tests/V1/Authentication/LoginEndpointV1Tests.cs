@@ -74,7 +74,7 @@ public sealed class LoginEndpointV1Tests : BaseTest
 		//Assert
 		rsp.StatusCode.Should().Be(HttpStatusCode.NotFound);
 	}
-	public LoginEndpointV1Tests(EndpointDockerFixture fixture, ITestOutputHelper outputHelper) : base(fixture, outputHelper)
+	public LoginEndpointV1Tests(ApiFixture fixture) : base(fixture)
 	{
 	}
 }

@@ -9,16 +9,14 @@ namespace ApiBestPracticesExample.Test.Integration.Tests;
 [Collection("DockerCollection")]
 public abstract class BaseTest : IAsyncLifetime
 {
-	protected readonly EndpointDockerFixture Fixture;
-	protected readonly ITestOutputHelper OutputHelper;
+	protected readonly ApiFixture Fixture;
 	protected readonly AppDbContext DbContext;
 	protected HttpClient Admin { get; private set; } = null!;
 	protected HttpClient Client { get; private set; } = null!;
 	protected HttpClient Anonymous { get; private set; } = null!;
-	protected BaseTest(EndpointDockerFixture fixture, ITestOutputHelper outputHelper)
+	protected BaseTest(ApiFixture fixture)
 	{
 		Fixture = fixture;
-		OutputHelper = outputHelper;
 		DbContext = Fixture.Services.GetRequiredService<AppDbContext>();
 	}
 
@@ -30,9 +28,10 @@ public abstract class BaseTest : IAsyncLifetime
 		await SetupClientDefaultClientAsync();
 	}
 
-	public Task DisposeAsync()
+	public async Task DisposeAsync()
 	{
-		return Fixture.ResetDatabaseAsync();
+		await Fixture.ResetDatabaseAsync();
+		await DbContext.DisposeAsync();
 	}
 
 	protected List<Claim> ParseClaimsFromJwt(string accessToken)

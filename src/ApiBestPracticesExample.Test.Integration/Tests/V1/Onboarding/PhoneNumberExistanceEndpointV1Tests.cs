@@ -27,7 +27,7 @@ public sealed class PhoneNumberExistenceEndpointV1Tests:BaseTest
 		res.Should().BeFalse();
 	}
 
-	public PhoneNumberExistenceEndpointV1Tests(EndpointDockerFixture fixture, ITestOutputHelper outputHelper) : base(fixture, outputHelper)
+	public PhoneNumberExistenceEndpointV1Tests(ApiFixture fixture) : base(fixture)
 	{
 	}
 }

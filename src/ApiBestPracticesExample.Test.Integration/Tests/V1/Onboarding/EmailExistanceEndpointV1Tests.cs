@@ -26,7 +26,7 @@ public sealed class EmailExistenceEndpointV1Tests : BaseTest
 		rsp.StatusCode.Should().Be(HttpStatusCode.OK);
 		res.Should().BeFalse();
 	}
-	public EmailExistenceEndpointV1Tests(EndpointDockerFixture fixture, ITestOutputHelper outputHelper) : base(fixture, outputHelper)
+	public EmailExistenceEndpointV1Tests(ApiFixture fixture) : base(fixture)
 	{
 	}
 }

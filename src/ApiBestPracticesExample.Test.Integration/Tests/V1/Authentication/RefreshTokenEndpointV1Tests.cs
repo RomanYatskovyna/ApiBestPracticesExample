@@ -72,7 +72,7 @@ public sealed class RefreshTokenEndpointV1Tests : BaseTest
 	}
 
 
-	public RefreshTokenEndpointV1Tests(EndpointDockerFixture fixture, ITestOutputHelper outputHelper) : base(fixture, outputHelper)
+	public RefreshTokenEndpointV1Tests(ApiFixture fixture) : base(fixture)
 	{
 	}
 }
