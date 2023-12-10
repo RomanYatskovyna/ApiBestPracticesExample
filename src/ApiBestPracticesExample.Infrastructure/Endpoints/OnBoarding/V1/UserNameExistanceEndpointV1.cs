@@ -7,7 +7,7 @@ public sealed class UserNameExistenceEndpointV1 : Endpoint<string, bool>
 	{
 		Post("onboarding/validate-user-name-uniqueness");
 		AllowAnonymous();
-		Description(d => { d.WithDisplayName("ValidateEmail"); });
+		Description(d => { d.WithDisplayName("ValidateUserName"); });
 		Summary(s =>
 		{
 			s.Summary = "short summary goes here";

@@ -23,8 +23,8 @@ public class LoginEndpointV1 : Endpoint<LoginRequest, TokenResponse>
 		});
 		Summary(s =>
 		{
-			s.Summary = "short summary goes here";
-			s.Description = "long description goes here";
+			s.Summary = "User authorization endpoint";
+			s.Description = "Here user can login and receive access and refresh tokens";
 		});
 		//Options(x => x.CacheOutput(p =>
 		//{

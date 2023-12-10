@@ -21,6 +21,7 @@ public class UserCreateDto
 	/// </summary>
 	[DefaultValue("+3538991569")]
 	public string? PhoneNumber { get; set; }
+	/// <summary>
 	/// User password
 	/// </summary>
 	[DefaultValue("Qwerty123$")]

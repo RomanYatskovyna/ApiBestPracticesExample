@@ -7,7 +7,7 @@ public sealed class PhoneNumberExistenceEndpointV1 : Endpoint<string, bool>
 	{
 		Post("onboarding/validate-phone-number-uniqueness");
 		AllowAnonymous();
-		Description(d => { d.WithDisplayName("ValidateEmail"); });
+		Description(d => { d.WithDisplayName("ValidatePhoneNumber"); });
 		Summary(s =>
 		{
 			s.Summary = "short summary goes here";
