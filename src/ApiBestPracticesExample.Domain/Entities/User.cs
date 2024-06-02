@@ -1,6 +1,6 @@
 ﻿namespace ApiBestPracticesExample.Domain.Entities;
 
-public partial class User
+public class User
 {
     public int Id { get; set; }
 

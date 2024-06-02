@@ -1,5 +1,3 @@
 ﻿namespace ApiBestPracticesExample.Presentation;
 
-public interface IApiMarker
-{
-}
+public interface IApiMarker;

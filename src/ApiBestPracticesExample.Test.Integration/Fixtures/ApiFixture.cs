@@ -1,5 +1,4 @@
 ﻿using ApiBestPracticesExample.Presentation;
-using DotNet.Testcontainers.Containers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Respawn;
@@ -11,77 +10,80 @@ namespace ApiBestPracticesExample.Test.Integration.Fixtures;
 
 public class ApiFixture : TestFixture<IApiMarker>
 {
-	private const int SqlContainerPort = 63000;
-	private const int RedisContainerPort = 62000;
+    private const int SqlContainerPort = 63000;
+    private const int RedisContainerPort = 62000;
 
-	private readonly MsSqlContainer _sqlContainer = new MsSqlBuilder()
-		.WithImage("mcr.microsoft.com/mssql/server:2022-latest")
-		.WithName("TestSqlDatabase-" + SqlContainerPort)
-		.WithPassword("Qwerty123$")
-		.WithPortBinding(SqlContainerPort.ToString(), "1433")
-		.Build();
+    private readonly RedisContainer _redisContainer = new RedisBuilder()
+        .WithImage("redis:latest")
+        .WithName("TestRedisDatabase-" + RedisContainerPort)
+        .WithPortBinding(RedisContainerPort.ToString(), "6379")
+        .Build();
 
-	private readonly RedisContainer _redisContainer = new RedisBuilder()
-		.WithImage("redis:latest")
-		.WithName("TestRedisDatabase-" + RedisContainerPort)
-		.WithPortBinding(RedisContainerPort.ToString(), "6379")
-		.Build();
+    private readonly MsSqlContainer _sqlContainer = new MsSqlBuilder()
+        .WithImage("mcr.microsoft.com/mssql/server:2022-latest")
+        .WithName("TestSqlDatabase-" + SqlContainerPort)
+        .WithPassword("Qwerty123$")
+        .WithPortBinding(SqlContainerPort.ToString(), "1433")
+        .Build();
 
-	public ApiFixture(IMessageSink s) : base(s)
-	{
-	}
-	protected override void ConfigureServices(IServiceCollection s)
-	{
-		InitDockerContainers();
+    private Respawner _respawner = null!;
 
-		s.RemoveAll(typeof(DbContextOptions<AppDbContext>));
-		s.RemoveAll(typeof(AppDbContext));
-		var conStr = _sqlContainer.GetConnectionString();
-		s.AddCustomDbContextPool<AppDbContext>(conStr, true);
+    public ApiFixture(IMessageSink s) : base(s)
+    {
+    }
 
-		base.ConfigureServices(s);
-	}
+    protected override void ConfigureServices(IServiceCollection s)
+    {
+        InitDockerContainers();
 
-	private void InitDockerContainers()
-	{
-		var dockerStartupTasks = new[]
-		{
-			Task.Run(() => _sqlContainer.StartAsync()),
-			Task.Run(() => _redisContainer.StartAsync()),
-		};
-		Task.WaitAll(dockerStartupTasks);
-	}
-	private Respawner _respawner = null!;
+        s.RemoveAll(typeof(DbContextOptions<AppDbContext>));
+        s.RemoveAll(typeof(AppDbContext));
+        var conStr = _sqlContainer.GetConnectionString();
+        s.AddCustomDbContextPool<AppDbContext>(conStr, true);
 
-	public Task InitDatabaseAsync()
-	{
-		return Services.PrepareDbAsync();
-	}
-	public async Task ResetDatabaseAsync()
-	{
-		var conStr = _sqlContainer.GetConnectionString();
-		await _respawner.ResetAsync(conStr);
-		var context = Services.GetRequiredService<AppDbContext>();
-		context.ChangeTracker.Clear();
-		AppDbContextSeeder.DefaultUser.Id = 0;
-		AppDbContextSeeder.DefaultAdmin.Id = 0;
-		AppDbContextSeeder.DefaultAdmin.RoleNameNavigation = null!;
-		AppDbContextSeeder.DefaultUser.RoleNameNavigation = null!;
-	}
-	protected override async Task SetupAsync()
-	{
-		var conStr = _sqlContainer.GetConnectionString();
-		_respawner = await Respawner.CreateAsync(conStr, new RespawnerOptions
-		{
-			SchemasToInclude = new[]
-			{
-				"dbo"
-			},
-			TablesToIgnore = new[]
-			{
-				new Table("__EFMigrationsHistory")
-			},
-			DbAdapter = DbAdapter.SqlServer
-		});
-	}
+        base.ConfigureServices(s);
+    }
+
+    private void InitDockerContainers()
+    {
+        var dockerStartupTasks = new[]
+        {
+            Task.Run(() => _sqlContainer.StartAsync()), Task.Run(() => _redisContainer.StartAsync()),
+        };
+        Task.WaitAll(dockerStartupTasks);
+    }
+
+    public Task InitDatabaseAsync()
+    {
+        return Services.PrepareDbAsync();
+    }
+
+    public async Task ResetDatabaseAsync()
+    {
+        var conStr = _sqlContainer.GetConnectionString();
+        await _respawner.ResetAsync(conStr);
+        var context = Services.GetRequiredService<AppDbContext>();
+        context.ChangeTracker.Clear();
+        AppDbContextSeeder.DefaultUser.Id = 0;
+        AppDbContextSeeder.DefaultAdmin.Id = 0;
+        AppDbContextSeeder.DefaultAdmin.RoleNameNavigation = null!;
+        AppDbContextSeeder.DefaultUser.RoleNameNavigation = null!;
+    }
+
+    protected override async Task SetupAsync()
+    {
+        var conStr = _sqlContainer.GetConnectionString();
+        _respawner = await Respawner.CreateAsync(conStr, new RespawnerOptions
+        {
+            SchemasToInclude =
+            [
+                "dbo",
+            ],
+            TablesToIgnore =
+            [
+                new Table("__EFMigrationsHistory"),
+            ],
+            DbAdapter = DbAdapter.SqlServer,
+        });
+    }
 }
