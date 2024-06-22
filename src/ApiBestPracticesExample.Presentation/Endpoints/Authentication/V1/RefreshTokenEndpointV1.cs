@@ -1,7 +1,9 @@
 ﻿using ApiBestPracticesExample.Domain.Entities;
+using ApiBestPracticesExample.Infrastructure.Settings;
 using Azure;
 using FastEndpoints.Security;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.Extensions.Options;
 using System.Security.Claims;
 
 namespace ApiBestPracticesExample.Presentation.Endpoints.Authentication.V1;
@@ -11,29 +13,17 @@ public sealed class RefreshTokenEndpointV1 : RefreshTokenService<TokenRequest, T
     private readonly AppDbContext _context;
     private readonly ILogger _logger;
 
-    public RefreshTokenEndpointV1(IConfiguration config, AppDbContext context,ILogger logger)
+    public RefreshTokenEndpointV1(IOptions<JwtOptions> jwtOptions, AppDbContext context, ILogger logger)
     {
         _context = context;
         _logger = logger;
 
-        var jwtSection = config.GetRequiredSection("Authentication:Jwt");
-        var signingKey = jwtSection["AccessTokenSigningKey"];
-
-        if (signingKey is null)
-        {
-            throw new ArgumentNullException("AccessTokenSigningKey is null");
-        }
-
-        if (signingKey.Length < 128)
-        {
-            throw new ArgumentOutOfRangeException("AccessTokenSigningKey must be more than 128 symbols");
-        }
-
+        var jwtOptionsValue = jwtOptions.Value;
         Setup(o =>
         {
-            o.TokenSigningKey = jwtSection["AccessTokenSigningKey"];
-            o.AccessTokenValidity = TimeSpan.FromMinutes(jwtSection.GetValue<int>("AccessTokenExpirationInMinutes"));
-            o.RefreshTokenValidity = TimeSpan.FromHours(jwtSection.GetValue<int>("RefreshTokenExpirationInHours"));
+            o.TokenSigningKey = jwtOptionsValue.AccessTokenSigningKey;
+            o.AccessTokenValidity = TimeSpan.FromMinutes(jwtOptionsValue.AccessTokenExpirationInMinutes);
+            o.RefreshTokenValidity = TimeSpan.FromHours(jwtOptionsValue.RefreshTokenExpirationInHours);
 
             o.Endpoint("authentication/refresh-token", ep =>
             {
@@ -52,7 +42,7 @@ public sealed class RefreshTokenEndpointV1 : RefreshTokenService<TokenRequest, T
     }
     public override async Task PersistTokenAsync(TokenResponse response)
     {
-        var refreshToken = await _context.RefreshTokens.SingleOrDefaultAsync(t=>t.UserEmail==response.UserId);
+        var refreshToken = await _context.RefreshTokens.SingleOrDefaultAsync(t => t.UserEmail == response.UserId);
 
         if (refreshToken is null)
         {
@@ -80,7 +70,7 @@ public sealed class RefreshTokenEndpointV1 : RefreshTokenService<TokenRequest, T
             _context.Update(refreshToken);
             await _context.SaveChangesAsync();
 
-            _logger.Information("Updated refresh token for user {UserEmail}", refreshToken.UserEmail);  
+            _logger.Information("Updated refresh token for user {UserEmail}", refreshToken.UserEmail);
         }
 
     }
@@ -100,7 +90,7 @@ public sealed class RefreshTokenEndpointV1 : RefreshTokenService<TokenRequest, T
             ThrowError(r => r.RefreshToken, "Refresh token is invalid!");
         }
 
-        if ( refreshToken.ExpiryDate <= DateTime.UtcNow)
+        if (refreshToken.ExpiryDate <= DateTime.UtcNow)
         {
             ThrowError(r => r.RefreshToken, "Refresh token is expired!");
         }

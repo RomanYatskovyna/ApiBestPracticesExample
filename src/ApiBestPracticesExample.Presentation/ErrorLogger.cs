@@ -1,6 +1,6 @@
 ﻿namespace ApiBestPracticesExample.Presentation;
 
-public class ErrorLogger : IGlobalPostProcessor
+public sealed class ErrorLogger : IGlobalPostProcessor
 {
     public Task PostProcessAsync(IPostProcessorContext context, CancellationToken ct)
     {

@@ -19,4 +19,12 @@ public static class ConfigurationExtensions
         return configuration.GetConnectionString(name) ?? throw new InvalidOperationException(
             $"Configuration missing value for: {(configuration is IConfigurationSection s ? s.Path + ":ConnectionStrings:" + name : "ConnectionStrings:" + name)}");
     }
+    public static IServiceCollection AddOptionsWithValidation<TOptions>(this IServiceCollection services, string configurationName) where TOptions : class
+    {
+        services.AddOptionsWithValidateOnStart<TOptions>()
+            .BindConfiguration(configurationName)
+            .ValidateDataAnnotations();
+
+        return services;
+    }
 }

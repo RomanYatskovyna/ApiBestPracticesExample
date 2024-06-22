@@ -1,4 +1,5 @@
 ﻿using ApiBestPracticesExample.Infrastructure.Caching;
+using ApiBestPracticesExample.Infrastructure.Settings;
 using FastEndpoints.ClientGen;
 using FastEndpoints.Security;
 using FastEndpoints.Swagger;
@@ -29,6 +30,7 @@ public static class DependencyInjection
             config.Assemblies = endpointAssemblies;
             config.IncludeAbstractValidators = true;
         });
+
         foreach (var version in supportedVersions)
         {
             services.SwaggerDocument(swaggerConfig =>
@@ -78,6 +80,11 @@ public static class DependencyInjection
         return app;
     }
 
+    public static IServiceCollection AddDefaultOptions(this IServiceCollection services)
+    {
+        services.AddOptionsWithValidation<JwtOptions>("Authentication:Jwt");
+        return services;    
+    }
     public static IServiceCollection AddCustomDbContextPool<TContext>(
         this IServiceCollection services,
         string connectionString,
@@ -139,7 +146,7 @@ public static class DependencyInjection
         if (initData)
         {
             await context.SeedDefaultDataAsync();
-            
+
             var logger = services.GetRequiredService<ILogger>();
             logger.Information("Default data seeded successfully");
 
