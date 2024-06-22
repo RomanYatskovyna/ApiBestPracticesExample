@@ -3,10 +3,10 @@ using System.Security.Claims;
 
 namespace ApiBestPracticesExample.Test.Integration.Tests.V1.Authentication;
 
-[Collection("DockerCollection")]
-public sealed class RefreshTokenEndpointV1Tests : BaseTest
+[Collection("TestCollection")]
+public sealed class MyRefreshTokenServiceV2Tests : BaseTest
 {
-    public RefreshTokenEndpointV1Tests(ApiFixture fixture) : base(fixture)
+    public MyRefreshTokenServiceV2Tests(ApiFixture fixture) : base(fixture)
     {
     }
 
@@ -17,7 +17,7 @@ public sealed class RefreshTokenEndpointV1Tests : BaseTest
         var (loginRsp, loginRes) = await Anonymous.POSTAsync<LoginEndpointV1, LoginRequest, TokenResponse>(
             new LoginRequest
             {
-                UserId = AppDbContextSeeder.DefaultAdmin.Email, Password = AppDbContextSeeder.DefaultAdminPassword,
+                Email = AppDbContextSeeder.DefaultAdmin.Email, Password = AppDbContextSeeder.DefaultAdminPassword,
             });
         loginRsp.IsSuccessStatusCode.Should().BeTrue();
         //Act
@@ -27,10 +27,11 @@ public sealed class RefreshTokenEndpointV1Tests : BaseTest
         });
         //Assert
         rsp.StatusCode.Should().Be(HttpStatusCode.OK);
-        var dbUser = await DbContext.Users.SingleAsync(u => u.Email == res.UserId);
-        res.RefreshToken.Should().Be(dbUser.RefreshToken);
 
-        var claims = ParseClaimsFromJwt(res.AccessToken);
+        var dbUser = await DbContext.Users.Include(user => user.RefreshToken).SingleAsync(u => u.Email == res.UserId);
+        res.RefreshToken.Should().Be(dbUser.RefreshToken!.Token);
+
+        var claims = GetClaimsFromJwt(res.AccessToken);
         claims.Should().Contain(c => c.Type == "role" && c.Value == dbUser.RoleName);
         claims.Should().Contain(c => c.Type == ClaimTypes.Email && c.Value == dbUser.Email);
     }
@@ -42,7 +43,7 @@ public sealed class RefreshTokenEndpointV1Tests : BaseTest
         var (loginRsp, loginRes) = await Anonymous.POSTAsync<LoginEndpointV1, LoginRequest, TokenResponse>(
             new LoginRequest
             {
-                UserId = AppDbContextSeeder.DefaultAdmin.Email, Password = AppDbContextSeeder.DefaultAdminPassword,
+                Email = AppDbContextSeeder.DefaultAdmin.Email, Password = AppDbContextSeeder.DefaultAdminPassword,
             });
         loginRsp.IsSuccessStatusCode.Should().BeTrue();
         //Act
@@ -61,7 +62,8 @@ public sealed class RefreshTokenEndpointV1Tests : BaseTest
         var (loginRsp, loginRes) = await Anonymous.POSTAsync<LoginEndpointV1, LoginRequest, TokenResponse>(
             new LoginRequest
             {
-                UserId = AppDbContextSeeder.DefaultAdmin.Email, Password = AppDbContextSeeder.DefaultAdminPassword,
+                Email = AppDbContextSeeder.DefaultAdmin.Email,
+                Password = AppDbContextSeeder.DefaultAdminPassword,
             });
         loginRsp.IsSuccessStatusCode.Should().BeTrue();
         //Act

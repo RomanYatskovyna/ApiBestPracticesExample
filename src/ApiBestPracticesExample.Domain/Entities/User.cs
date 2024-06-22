@@ -1,11 +1,8 @@
-﻿namespace ApiBestPracticesExample.Domain.Entities;
+﻿
+namespace ApiBestPracticesExample.Domain.Entities;
 
-public class User
+public partial class User
 {
-    public int Id { get; set; }
-
-    public string UserName { get; set; } = null!;
-
     public string Email { get; set; } = null!;
 
     public string? PhoneNumber { get; set; }
@@ -14,9 +11,7 @@ public class User
 
     public string RoleName { get; set; } = null!;
 
-    public string? RefreshToken { get; set; }
-
-    public DateTime? RefreshTokenExpiration { get; set; }
+    public virtual RefreshToken? RefreshToken { get; set; }
 
     public virtual Role RoleNameNavigation { get; set; } = null!;
 }

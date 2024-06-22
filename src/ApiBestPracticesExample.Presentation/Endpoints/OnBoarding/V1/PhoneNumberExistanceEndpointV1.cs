@@ -22,8 +22,9 @@ public sealed class PhoneNumberExistenceEndpointV1 : Endpoint<string, bool>
         Version((int)ApiSupportedVersions.V1);
     }
 
-    public override async Task HandleAsync(string req, CancellationToken ct)
+    public override Task<bool> ExecuteAsync(string req, CancellationToken ct)
     {
-        Response = await _context.Users.AnyAsync(u => u.PhoneNumber == req, ct);
+       return _context.Users.AnyAsync(u => u.PhoneNumber == req, ct);
     }
+
 }

@@ -13,7 +13,8 @@ namespace ApiBestPracticesExample.Infrastructure.Database
 {
     public static class DbContextExtensions
     {
-        public static async Task<List<T>> SqlQueryAsync<T>(this DbContext db, string sql, object[] parameters = null, CancellationToken cancellationToken = default) where T : class
+        public static async Task<List<T>> SqlQueryAsync<T>(this DbContext db, string sql, object[] parameters = null, CancellationToken cancellationToken = default)
+           where T : class
         {
             if (parameters is null)
             {
@@ -22,7 +23,9 @@ namespace ApiBestPracticesExample.Infrastructure.Database
 
             if (typeof(T).GetProperties().Any())
             {
-                return await db.Set<T>().FromSqlRaw(sql, parameters).ToListAsync(cancellationToken);
+                return await db.Database
+                    .SqlQueryRaw<T>(sql, parameters)
+                    .ToListAsync(cancellationToken);
             }
             else
             {

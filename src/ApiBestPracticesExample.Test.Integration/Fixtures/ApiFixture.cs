@@ -8,10 +8,11 @@ using Testcontainers.Redis;
 
 namespace ApiBestPracticesExample.Test.Integration.Fixtures;
 
-public class ApiFixture : TestFixture<IApiMarker>
+public class ApiFixture : AppFixture<IApiMarker>
 {
     private const int SqlContainerPort = 63000;
     private const int RedisContainerPort = 62000;
+
 
     private readonly RedisContainer _redisContainer = new RedisBuilder()
         .WithImage("redis:latest")
@@ -32,10 +33,13 @@ public class ApiFixture : TestFixture<IApiMarker>
     {
     }
 
+    protected override async Task PreSetupAsync()
+    {
+        await InitDockerContainersAsync();
+    }
+
     protected override void ConfigureServices(IServiceCollection s)
     {
-        InitDockerContainers();
-
         s.RemoveAll(typeof(DbContextOptions<AppDbContext>));
         s.RemoveAll(typeof(AppDbContext));
         var conStr = _sqlContainer.GetConnectionString();
@@ -43,33 +47,6 @@ public class ApiFixture : TestFixture<IApiMarker>
 
         base.ConfigureServices(s);
     }
-
-    private void InitDockerContainers()
-    {
-        var dockerStartupTasks = new[]
-        {
-            Task.Run(() => _sqlContainer.StartAsync()), Task.Run(() => _redisContainer.StartAsync()),
-        };
-        Task.WaitAll(dockerStartupTasks);
-    }
-
-    public Task InitDatabaseAsync()
-    {
-        return Services.PrepareDbAsync();
-    }
-
-    public async Task ResetDatabaseAsync()
-    {
-        var conStr = _sqlContainer.GetConnectionString();
-        await _respawner.ResetAsync(conStr);
-        var context = Services.GetRequiredService<AppDbContext>();
-        context.ChangeTracker.Clear();
-        AppDbContextSeeder.DefaultUser.Id = 0;
-        AppDbContextSeeder.DefaultAdmin.Id = 0;
-        AppDbContextSeeder.DefaultAdmin.RoleNameNavigation = null!;
-        AppDbContextSeeder.DefaultUser.RoleNameNavigation = null!;
-    }
-
     protected override async Task SetupAsync()
     {
         var conStr = _sqlContainer.GetConnectionString();
@@ -86,4 +63,42 @@ public class ApiFixture : TestFixture<IApiMarker>
             DbAdapter = DbAdapter.SqlServer,
         });
     }
+    private Task InitDockerContainersAsync()
+    {
+        var tasks = new[]
+        {
+            _sqlContainer.StartAsync(),
+            _redisContainer.StartAsync(),
+        };
+
+        return Task.WhenAll(tasks);
+    }
+
+    public Task InitDatabaseAsync()
+    {
+        return Services.PrepareDbAsync();
+    }
+
+    protected override async Task TearDownAsync()
+    {
+        var tasks = new[]
+        {
+            _sqlContainer.StopAsync(),
+            _redisContainer.StopAsync(),
+        };
+
+        await Task.WhenAll(tasks);
+    }
+
+    public async Task ResetDatabaseAsync()
+    {
+        var conStr = _sqlContainer.GetConnectionString();
+        await _respawner.ResetAsync(conStr);
+
+        var context = Services.GetRequiredService<AppDbContext>();
+        context.ChangeTracker.Clear();
+
+    }
+
+
 }

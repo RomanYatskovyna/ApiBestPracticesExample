@@ -2,7 +2,7 @@
 
 namespace ApiBestPracticesExample.Test.Integration.Tests.V1.Onboarding;
 
-[Collection("DockerCollection")]
+[Collection("TestCollection")]
 public sealed class EmailExistenceEndpointV1Tests : BaseTest
 {
     public EmailExistenceEndpointV1Tests(ApiFixture fixture) : base(fixture)

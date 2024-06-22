@@ -1,4 +1,6 @@
-﻿namespace ApiBestPracticesExample.Presentation.Endpoints.OnBoarding.V1;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+
+namespace ApiBestPracticesExample.Presentation.Endpoints.OnBoarding.V1;
 
 public sealed class EmailExistenceEndpointV1 : Endpoint<string, bool>
 {
@@ -22,8 +24,8 @@ public sealed class EmailExistenceEndpointV1 : Endpoint<string, bool>
         Version((int)ApiSupportedVersions.V1);
     }
 
-    public override async Task HandleAsync(string req, CancellationToken ct)
+    public override Task<bool> ExecuteAsync(string req, CancellationToken ct)
     {
-        Response = await _context.Users.AnyAsync(u => u.Email == req, ct);
+        return _context.Users.AnyAsync(u => u.Email == req, ct);
     }
 }

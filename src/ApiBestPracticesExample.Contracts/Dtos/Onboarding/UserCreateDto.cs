@@ -9,12 +9,6 @@ namespace ApiBestPracticesExample.Contracts.Dtos.Onboarding;
 public sealed record UserCreateDto
 {
     /// <summary>
-    ///     User unique name
-    /// </summary>
-    [DefaultValue("UniqueName")]
-    public required string UserName { get; init; }
-
-    /// <summary>
     ///     User email
     /// </summary>
     [DefaultValue("email@domain.com")]
@@ -37,10 +31,6 @@ public sealed class UserCreateDtoValidator : AbstractValidator<UserCreateDto>
 {
     public UserCreateDtoValidator()
     {
-        RuleFor(x => x.UserName)
-            .MinimumLength(3).WithMessage("UserName must be at least 3 characters long")
-            .MaximumLength(100).WithMessage("UserName length must be less then 100 symbols");
-
         RuleFor(x => x.Email)
             .EmailAddress().WithMessage("Email address is not valid")
             .MaximumLength(100).WithMessage("Email length must be less then 100 symbols");

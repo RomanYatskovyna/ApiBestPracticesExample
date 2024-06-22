@@ -1,12 +1,11 @@
 using ApiBestPracticesExample.Presentation;
 using ApiBestPracticesExample.Presentation.Endpoints.Authentication.V1;
 using FastEndpoints.Swagger;
-using Serilog;
 
 var apiVersions = Enum.GetValues<ApiSupportedVersions>().Select(version => (int)version).ToList();
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddDefaultServices(builder.Configuration, [typeof(LoginEndpointV1).Assembly], apiVersions);
+builder.Services.AddDefaultServices(builder.Configuration, apiVersions, typeof(LoginEndpointV1).Assembly);
 
 var conStr = builder.Configuration.GetRequiredConnectionString("SqlConnection");
 builder.Services.AddCustomDbContextPool<AppDbContext>(conStr, builder.Environment.IsDevelopment());
@@ -25,6 +24,6 @@ app.UseDefaultFastEndpoints();
 app.UseClientGen(apiVersions);
 app.UseSwaggerGen();
 
-await app.Services.PrepareDbAsync();
+await app.PrepareDbAsync();
 
 await app.RunAsync();

@@ -4,7 +4,6 @@ using FastEndpoints.Security;
 using FastEndpoints.Swagger;
 using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Serilog;
 using StackExchange.Redis;
 using System.Reflection;
 using System.Text.Json.Serialization;
@@ -14,13 +13,17 @@ namespace ApiBestPracticesExample.Presentation;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddDefaultServices(this IServiceCollection services, IConfiguration configuration,
-        List<Assembly> endpointAssemblies, List<int> supportedVersions)
+    public static IServiceCollection AddDefaultServices(
+        this IServiceCollection services,
+        IConfiguration configuration,
+        List<int> supportedVersions,
+        params Assembly[] endpointAssemblies)
     {
         services.AddSerilog(logger =>
         {
             logger.ReadFrom.Configuration(configuration);
         });
+
         services.AddFastEndpoints(config =>
         {
             config.Assemblies = endpointAssemblies;
@@ -49,7 +52,7 @@ public static class DependencyInjection
             {
                 var tokenKey = configuration.GetRequiredValue("Authentication:Jwt:AccessTokenSigningKey");
                 o.SigningKey = tokenKey;
-                o.SigningStyle = TokenSigningStyle.Asymmetric;
+                o.SigningStyle = TokenSigningStyle.Symmetric;
 
             }
            );
@@ -75,8 +78,11 @@ public static class DependencyInjection
         return app;
     }
 
-    public static IServiceCollection AddCustomDbContextPool<TContext>(this IServiceCollection services,
-        string connectionString, bool isDevelopment) where TContext : DbContext
+    public static IServiceCollection AddCustomDbContextPool<TContext>(
+        this IServiceCollection services,
+        string connectionString,
+        bool isDevelopment)
+        where TContext : DbContext
     {
         return services.AddDbContextPool<TContext>(options =>
         {
@@ -115,12 +121,16 @@ public static class DependencyInjection
         return app;
     }
 
-    public static async Task<IServiceProvider> PrepareDbAsync(this IServiceProvider services, bool migrateDatabase = true,
-        bool initData = true, bool initDevelopmentData = true)
+    public static async Task<IServiceProvider> PrepareDbAsync(
+        this IServiceProvider services,
+        bool migrateDatabase = true,
+        bool initData = true,
+        bool initDevelopmentData = true
+        )
     {
         await using var scope = services.CreateAsyncScope();
         await using var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        var logger = services.GetRequiredService<ILogger>();
+
         if (migrateDatabase)
         {
             await context.Database.MigrateAsync();
@@ -129,6 +139,8 @@ public static class DependencyInjection
         if (initData)
         {
             await context.SeedDefaultDataAsync();
+            
+            var logger = services.GetRequiredService<ILogger>();
             logger.Information("Default data seeded successfully");
 
             if (initDevelopmentData)
@@ -141,22 +153,27 @@ public static class DependencyInjection
         return services;
     }
 
-    public static async Task<IServiceProvider> PrepareDbAsync(this IServiceProvider services, IConfiguration configuration, IHostEnvironment environment)
+    public static async Task<WebApplication> PrepareDbAsync(this WebApplication app)
     {
-        var dbSection = configuration.GetRequiredSection("Database");
+        if (app.Environment.EnvironmentName != "Testing")
+        {
+            var dbSection = app.Configuration.GetRequiredSection("Database");
 
-        await services.PrepareDbAsync(
-            dbSection.GetRequiredValue<bool>("MigrateDatabase"),
-            dbSection.GetRequiredValue<bool>("MigrateDatabase"),
-            !environment.IsProduction()
+            await app.Services.PrepareDbAsync(
+                dbSection.GetRequiredValue<bool>("MigrateDatabase"),
+                dbSection.GetRequiredValue<bool>("InitData"),
+                !app.Environment.IsProduction()
             );
 
-        return services;
+        }
+
+        return app;
     }
 
     public static IServiceCollection AddOutputCache(this IServiceCollection services, string? redisConStr)
     {
         services.AddOutputCache();
+
         if (string.IsNullOrEmpty(redisConStr))
         {
             return services;

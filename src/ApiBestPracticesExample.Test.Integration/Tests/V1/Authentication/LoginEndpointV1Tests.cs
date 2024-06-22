@@ -3,7 +3,7 @@ using System.Security.Claims;
 
 namespace ApiBestPracticesExample.Test.Integration.Tests.V1.Authentication;
 
-[Collection("DockerCollection")]
+[Collection("TestCollection")]
 public sealed class LoginEndpointV1Tests : BaseTest
 {
     public LoginEndpointV1Tests(ApiFixture fixture) : base(fixture)
@@ -16,18 +16,25 @@ public sealed class LoginEndpointV1Tests : BaseTest
         //Arrange
         var request = new LoginRequest
         {
-            UserId = AppDbContextSeeder.DefaultAdmin.Email, Password = AppDbContextSeeder.DefaultAdminPassword,
+            Email = AppDbContextSeeder.DefaultAdmin.Email,
+            Password = AppDbContextSeeder.DefaultAdminPassword,
         };
         //Act
         var (rsp, res) = await Anonymous.POSTAsync<LoginEndpointV1, LoginRequest, TokenResponse>(request);
         //Assert
         rsp.StatusCode.Should().Be(HttpStatusCode.OK);
-        var dbUser = await DbContext.Users.SingleAsync(u => u.Email == res.UserId);
-        res.RefreshToken.Should().Be(dbUser.RefreshToken);
 
-        var claims = ParseClaimsFromJwt(res.AccessToken);
+        var dbUser = await DbContext.Users
+            .Include(user => user.RefreshToken)
+            .SingleAsync(u => u.Email == res.UserId);
+
+        res.RefreshToken.Should().Be(dbUser.RefreshToken!.Token);
+
+        var claims = GetClaimsFromJwt(res.AccessToken);
         claims.Should().Contain(c => c.Type == "role" && c.Value == dbUser.RoleName);
         claims.Should().Contain(c => c.Type == ClaimTypes.Email && c.Value == dbUser.Email);
+
+
     }
 
     [Fact]
@@ -36,16 +43,20 @@ public sealed class LoginEndpointV1Tests : BaseTest
         //Arrange
         var request = new LoginRequest
         {
-            UserId = AppDbContextSeeder.DefaultUser.Email, Password = AppDbContextSeeder.DefaultUserPassword,
+            Email = AppDbContextSeeder.DefaultUser.Email,
+            Password = AppDbContextSeeder.DefaultUserPassword,
         };
         //Act
         var (rsp, res) = await Anonymous.POSTAsync<LoginEndpointV1, LoginRequest, TokenResponse>(request);
         //Assert
         rsp.StatusCode.Should().Be(HttpStatusCode.OK);
-        var dbUser = await DbContext.Users.SingleAsync(u => u.Email == res.UserId);
-        res.RefreshToken.Should().Be(dbUser.RefreshToken);
 
-        var claims = ParseClaimsFromJwt(res.AccessToken);
+        var dbUser = await DbContext.Users
+            .Include(user => user.RefreshToken)
+            .SingleAsync(u => u.Email == res.UserId);
+        res.RefreshToken.Should().Be(dbUser.RefreshToken!.Token);
+
+        var claims = GetClaimsFromJwt(res.AccessToken);
         claims.Should().Contain(c => c.Type == "role" && c.Value == dbUser.RoleName);
         claims.Should().Contain(c => c.Type == ClaimTypes.Email && c.Value == dbUser.Email);
     }
@@ -54,9 +65,13 @@ public sealed class LoginEndpointV1Tests : BaseTest
     public async Task Returns_404_When_UserIdAbsent()
     {
         //Arrange
-        var request = new LoginRequest { UserId = "WrongEmail", Password = AppDbContextSeeder.DefaultAdminPassword };
+        var request = new LoginRequest
+        {
+            Email = "WrongEmail", 
+            Password = AppDbContextSeeder.DefaultAdminPassword,
+        };
         //Act
-        var (rsp, res) = await Anonymous.POSTAsync<LoginEndpointV1, LoginRequest, string>(request);
+        var (rsp, _) = await Anonymous.POSTAsync<LoginEndpointV1, LoginRequest, string>(request);
         //Assert
         rsp.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
@@ -65,9 +80,13 @@ public sealed class LoginEndpointV1Tests : BaseTest
     public async Task Returns_404_When_PasswordIsWrong()
     {
         //Arrange
-        var request = new LoginRequest { UserId = AppDbContextSeeder.DefaultAdmin.Email, Password = "WrongPassword" };
+        var request = new LoginRequest
+        {
+            Email = AppDbContextSeeder.DefaultAdmin.Email,
+            Password = "WrongPassword",
+        };
         //Act
-        var (rsp, res) = await Anonymous.POSTAsync<LoginEndpointV1, LoginRequest, TokenResponse>(request);
+        var (rsp, _) = await Anonymous.POSTAsync<LoginEndpointV1, LoginRequest, TokenResponse>(request);
         //Assert
         rsp.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }

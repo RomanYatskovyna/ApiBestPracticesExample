@@ -7,7 +7,7 @@ using System.Security.Claims;
 
 namespace ApiBestPracticesExample.Test.Integration.Tests;
 
-[Collection("DockerCollection")]
+[Collection("TestCollection")]
 public abstract class BaseTest : IAsyncLifetime
 {
     protected readonly AppDbContext DbContext;
@@ -26,7 +26,9 @@ public abstract class BaseTest : IAsyncLifetime
     public async Task InitializeAsync()
     {
         await Fixture.InitDatabaseAsync();
+
         Anonymous = Fixture.Client;
+
         await SetupAdminDefaultClientAsync();
         await SetupClientDefaultClientAsync();
     }
@@ -37,7 +39,13 @@ public abstract class BaseTest : IAsyncLifetime
         await DbContext.DisposeAsync();
     }
 
-    protected List<Claim> ParseClaimsFromJwt(string accessToken)
+    protected List<Claim> GetClaimsFromJwt(string accessToken)
+    {
+        var token = GetTokenFromJwt(accessToken);
+
+        return token.Claims.ToList();
+    }
+    protected JwtSecurityToken GetTokenFromJwt(string accessToken)
     {
         var handler = new JwtSecurityTokenHandler();
         if (!handler.CanReadToken(accessToken))
@@ -46,16 +54,17 @@ public abstract class BaseTest : IAsyncLifetime
         }
 
         var token = handler.ReadJwtToken(accessToken);
-        return token.Claims.ToList();
+        return token;
     }
-
     private async Task SetupAdminDefaultClientAsync()
     {
         var (rsp, res) = await Anonymous.POSTAsync<LoginEndpointV1, LoginRequest, TokenResponse>(new LoginRequest
         {
-            UserId = AppDbContextSeeder.DefaultAdmin.Email, Password = AppDbContextSeeder.DefaultAdminPassword,
+            Email = AppDbContextSeeder.DefaultAdmin.Email,
+            Password = AppDbContextSeeder.DefaultAdminPassword,
         });
         rsp.IsSuccessStatusCode.Should().BeTrue();
+
         Admin = Fixture.CreateClient(c =>
             c.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue(JwtBearerDefaults.AuthenticationScheme, res.AccessToken));
@@ -65,9 +74,10 @@ public abstract class BaseTest : IAsyncLifetime
     {
         var (rsp, res) = await Anonymous.POSTAsync<LoginEndpointV1, LoginRequest, TokenResponse>(new LoginRequest
         {
-            UserId = AppDbContextSeeder.DefaultUser.Email, Password = AppDbContextSeeder.DefaultUserPassword,
+            Email = AppDbContextSeeder.DefaultUser.Email, Password = AppDbContextSeeder.DefaultUserPassword,
         });
         rsp.IsSuccessStatusCode.Should().BeTrue();
+
         Client = Fixture.CreateClient(c =>
             c.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue(JwtBearerDefaults.AuthenticationScheme, res.AccessToken));

@@ -1,16 +1,19 @@
 ﻿using ApiBestPracticesExample.Contracts;
 using ApiBestPracticesExample.Contracts.Dtos.Onboarding;
 using ApiBestPracticesExample.Infrastructure.Mappers;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace ApiBestPracticesExample.Presentation.Endpoints.OnBoarding.V1;
 
-public sealed class RegisterUserEndpointV1 : Endpoint<UserCreateDto, UserDto>
+public sealed class RegisterUserEndpointV1 : Endpoint<UserCreateDto, Results<Ok<UserDto>, BadRequest<ProblemDetails>>>
 {
     private readonly AppDbContext _context;
+    private readonly ILogger _logger;
 
-    public RegisterUserEndpointV1(AppDbContext context)
+    public RegisterUserEndpointV1(AppDbContext context,ILogger logger)
     {
         _context = context;
+        _logger = logger;
     }
 
     public override void Configure()
@@ -26,13 +29,8 @@ public sealed class RegisterUserEndpointV1 : Endpoint<UserCreateDto, UserDto>
         Version((int)ApiSupportedVersions.V1);
     }
 
-    public override async Task HandleAsync(UserCreateDto req, CancellationToken ct)
+    public override async Task<Results<Ok<UserDto>, BadRequest<ProblemDetails>>> ExecuteAsync(UserCreateDto req, CancellationToken ct)
     {
-        if (await _context.Users.AnyAsync(u => u.UserName == req.UserName, ct))
-        {
-            AddError(r => r.UserName, "User with this userName already exists");
-        }
-
         if (await _context.Users.AnyAsync(u => u.Email == req.Email, ct))
         {
             AddError(r => r.Email, "User with this email already exists");
@@ -44,10 +42,17 @@ public sealed class RegisterUserEndpointV1 : Endpoint<UserCreateDto, UserDto>
         }
 
         ThrowIfAnyErrors();
+
         var user = req.MapUserCreateDtoToUser();
         user.RoleName = SupportedRoles.User;
+
         await _context.AddAsync(user, ct);
         await _context.SaveChangesAsync(ct);
-        Response = user.MapUserToUserDto();
+
+        _logger.Information("User {UserEmail} created", user.Email);
+
+        var userDto = user.MapUserToUserDto();
+        return TypedResults.Ok(userDto);
     }
+
 }

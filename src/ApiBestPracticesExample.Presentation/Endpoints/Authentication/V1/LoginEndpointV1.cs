@@ -1,17 +1,19 @@
-﻿using ApiBestPracticesExample.Infrastructure.Services;
+﻿using ApiBestPracticesExample.Contracts.Requests;
+using ApiBestPracticesExample.Infrastructure.Services;
 using FastEndpoints.Security;
-using Microsoft.AspNetCore.Identity.Data;
 using System.Security.Claims;
 
 namespace ApiBestPracticesExample.Presentation.Endpoints.Authentication.V1;
 
-public class LoginEndpointV1 : Endpoint<LoginRequest, TokenResponse>
+public sealed class LoginEndpointV1 : Endpoint<LoginRequest, TokenResponse>
 {
     private readonly AppDbContext _context;
+    private readonly ILogger _logger;
 
-    public LoginEndpointV1(AppDbContext context)
+    public LoginEndpointV1(AppDbContext context,ILogger logger)
     {
         _context = context;
+        _logger = logger;
     }
 
     public override void Configure()
@@ -27,26 +29,27 @@ public class LoginEndpointV1 : Endpoint<LoginRequest, TokenResponse>
             s.Summary = "User authorization endpoint";
             s.Description = "Here user can login and receive access and refresh tokens";
         });
-        //Options(x => x.CacheOutput(p =>
-        //{
-        //	p.Tag("login");
-        //	p.Expire(TimeSpan.FromSeconds(60));
-        //}));
         Version((int)ApiSupportedVersions.V1);
     }
 
-    public override async Task HandleAsync(LoginRequest req, CancellationToken ct)
+    public override async Task<TokenResponse> ExecuteAsync(LoginRequest req, CancellationToken ct)
     {
         var user = await _context.Users.SingleOrDefaultAsync(u => u.Email == req.Email, ct);
+
         if (user is null || !PasswordEncrypter.VerifyPassword(req.Password, user.PasswordHash))
         {
-            ThrowError("User with supplied credentials was not found", StatusCodes.Status404NotFound);
+            ThrowError("Invalid user credentials", StatusCodes.Status404NotFound);
         }
 
-        Response = await CreateTokenWith<RefreshTokenEndpointV1>(user.Email, u =>
+        var tokenResponse = await CreateTokenWith<RefreshTokenEndpointV1>(user.Email, u =>
         {
-            u.Roles.AddRange([user.RoleName]);
+            u.Roles.Add(user.RoleName);
             u.Claims.Add(new Claim(ClaimTypes.Email, user.Email));
+            u.Claims.Add(new Claim(ClaimTypes.Name, user.Email));
+
         });
+
+        _logger.Information("User {UserEmail} received token", user.Email);
+        return tokenResponse;
     }
 }

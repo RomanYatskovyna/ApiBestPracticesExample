@@ -22,24 +22,20 @@ public static class AppDbContextSeeder
 
     public static async Task SeedDevelopmentTestDataAsync(this AppDbContext context)
     {
-        User defaultAdmin = new()
-            {
-                UserName = "ReadOnlyAdmin@gmail.com",
-                Email = "ReadOnlyAdmin@gmail.com",
-                PasswordHash = PasswordEncrypter.HashPassword(DefaultAdminPassword),
-                RoleName = SupportedRoles.Admin,
-            },
-            defaultUser = new()
-            {
-                PhoneNumber = "+1 408-555-1234",
-                UserName = "ReadOnlyUser@gmail.com",
-                Email = "ReadOnlyUser@gmail.com",
-                PasswordHash = PasswordEncrypter.HashPassword(DefaultUserPassword),
-                RoleName = SupportedRoles.User,
-            };
-        await SeedEntityAsync(context, defaultAdmin, defaultUser);
-        DefaultAdmin = defaultAdmin;
-        DefaultUser = defaultUser;
+        DefaultAdmin = new()
+        {
+            Email = "ReadOnlyAdmin@gmail.com",
+            PasswordHash = PasswordEncrypter.HashPassword(DefaultAdminPassword),
+            RoleName = SupportedRoles.Admin,
+        };
+        DefaultUser = new()
+        {
+            PhoneNumber = "+1 408-555-1234",
+            Email = "ReadOnlyUser@gmail.com",
+            PasswordHash = PasswordEncrypter.HashPassword(DefaultUserPassword),
+            RoleName = SupportedRoles.User,
+        };
+        await SeedEntityAsync(context, DefaultAdmin, DefaultUser);
     }
 
     private static async Task SeedEntityAsync<TEntity>(DbContext context, params TEntity[] data) where TEntity : class
@@ -54,20 +50,17 @@ public static class AppDbContextSeeder
 
     private static async Task SeedRolesAsync(AppDbContext context)
     {
-        var roleFields =
-            typeof(SupportedRoles).GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy);
+        var roleFields = typeof(SupportedRoles).GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy);
+
         var roleNames = roleFields.Select(r => r.GetValue(null)!.ToString()!).ToList();
+
         foreach (var roleName in roleNames)
         {
             if (!await context.Roles.AnyAsync(role => role.Name == roleName))
             {
                 await context.Roles.AddAsync(new Role { Name = roleName });
-                await context.SaveChangesAsync();
             }
         }
-
-        //var roleDeletedCount = await context.Roles.Where(r => !roleNames.Contains(r.Name)).ExecuteDeleteAsync();
-        context.Roles.RemoveRange(context.Roles.Where(r => !roleNames.Contains(r.Name)));
         await context.SaveChangesAsync();
     }
 }
