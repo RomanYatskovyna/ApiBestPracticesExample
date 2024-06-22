@@ -162,8 +162,7 @@ public static class DependencyInjection
 
     public static async Task<WebApplication> PrepareDbAsync(this WebApplication app)
     {
-        if (app.Environment.EnvironmentName != "Testing")
-        {
+
             var dbSection = app.Configuration.GetRequiredSection("Database");
 
             await app.Services.PrepareDbAsync(
@@ -171,8 +170,6 @@ public static class DependencyInjection
                 dbSection.GetRequiredValue<bool>("InitData"),
                 !app.Environment.IsProduction()
             );
-
-        }
 
         return app;
     }
