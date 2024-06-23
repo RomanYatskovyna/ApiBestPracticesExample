@@ -3,6 +3,8 @@ using ApiBestPracticesExample.Infrastructure.Settings;
 using FastEndpoints.ClientGen;
 using FastEndpoints.Security;
 using FastEndpoints.Swagger;
+using HealthChecks.UI.Client;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using StackExchange.Redis;
@@ -58,8 +60,6 @@ public static class DependencyInjection
 
             }
            );
-
-        services.AddOutputCache(configuration.GetConnectionString("RedisConnection"));
         return services;
     }
 
@@ -83,7 +83,7 @@ public static class DependencyInjection
     public static IServiceCollection AddDefaultOptions(this IServiceCollection services)
     {
         services.AddOptionsWithValidation<JwtOptions>("Authentication:Jwt");
-        return services;    
+        return services;
     }
     public static IServiceCollection AddCustomDbContextPool<TContext>(
         this IServiceCollection services,
@@ -163,13 +163,13 @@ public static class DependencyInjection
     public static async Task<WebApplication> PrepareDbAsync(this WebApplication app)
     {
 
-            var dbSection = app.Configuration.GetRequiredSection("Database");
+        var dbSection = app.Configuration.GetRequiredSection("Database");
 
-            await app.Services.PrepareDbAsync(
-                dbSection.GetRequiredValue<bool>("MigrateDatabase"),
-                dbSection.GetRequiredValue<bool>("InitData"),
-                !app.Environment.IsProduction()
-            );
+        await app.Services.PrepareDbAsync(
+            dbSection.GetRequiredValue<bool>("MigrateDatabase"),
+            dbSection.GetRequiredValue<bool>("InitData"),
+            !app.Environment.IsProduction()
+        );
 
         return app;
     }
@@ -188,5 +188,38 @@ public static class DependencyInjection
         services.AddSingleton<IConnectionMultiplexer>(_ => ConnectionMultiplexer.Connect(redisConStr));
 
         return services;
+    }
+
+    public static IServiceCollection AddDefaultHealthChecks(this IServiceCollection services,string sqlConStr, string? redisConStr)
+    {
+        var health = services.AddHealthChecks()
+            .AddSqlServer(sqlConStr);
+
+        if (redisConStr is not null)
+        {
+            health.AddRedis(redisConStr);
+        }
+
+        services
+            .AddHealthChecksUI()
+            .AddInMemoryStorage();
+
+        return services;
+    }
+
+    public static WebApplication UseDefaultHealthChecks(this WebApplication app)
+    {
+        app.MapHealthChecks("/_health", new HealthCheckOptions
+        {
+            ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+        });
+
+        app.MapHealthChecksUI(o =>
+        {
+            o.UIPath = "/_health-ui";
+            o.ApiPath = "/_health-api";
+        });
+
+        return app;
     }
 }

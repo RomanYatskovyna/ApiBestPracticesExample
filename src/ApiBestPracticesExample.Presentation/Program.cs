@@ -8,8 +8,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDefaultServices(builder.Configuration, apiVersions, typeof(LoginEndpointV1).Assembly);
 builder.Services.AddDefaultOptions();
 
-var conStr = builder.Configuration.GetRequiredConnectionString("SqlConnection");
-builder.Services.AddCustomDbContextPool<AppDbContext>(conStr, builder.Environment.IsDevelopment());
+var sqlConStr = builder.Configuration.GetRequiredConnectionString("SqlConnection");
+builder.Services.AddCustomDbContextPool<AppDbContext>(sqlConStr, builder.Environment.IsDevelopment());
+
+var redisConStr = builder.Configuration.GetRequiredConnectionString("RedisConnection");
+builder.Services.AddOutputCache(redisConStr);
+
+builder.Services.AddDefaultHealthChecks(sqlConStr, redisConStr);
 
 var app = builder.Build();
 
@@ -19,6 +24,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseDefaultExceptionHandler();
+
+app.UseDefaultHealthChecks();
 
 app.UseDefaultFastEndpoints();
 
