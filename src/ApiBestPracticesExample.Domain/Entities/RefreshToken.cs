@@ -1,6 +1,6 @@
 ﻿namespace ApiBestPracticesExample.Domain.Entities;
 
-public class RefreshToken
+public partial class RefreshToken
 {
     public string UserEmail { get; set; } = null!;
 
