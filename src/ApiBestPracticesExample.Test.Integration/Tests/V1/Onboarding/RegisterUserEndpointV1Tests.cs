@@ -20,10 +20,10 @@ public sealed class RegisterUserEndpointV1Tests : BaseTest
             Email = Fixture.Fake.Internet.Email(),
             Password = "Qwerty123$",
         };
-        
+
         //Act
         var (rsp, res) = await Admin.POSTAsync<RegisterUserEndpointV1, UserCreateDto, UserDto>(request);
-        
+
         //Assert
         await rsp.Content.ReadAsStringAsync();
 
@@ -35,16 +35,12 @@ public sealed class RegisterUserEndpointV1Tests : BaseTest
     public async Task Returns_400ProblemDetails_When_DataIsInvalid()
     {
         //Arrange
-        var request = new UserCreateDto
-        {
-            PhoneNumber = "1",
-            Email = "WrongEmail",
-            Password = "w",
-        };
+        var request = new UserCreateDto { PhoneNumber = "1", Email = "WrongEmail", Password = "w" };
 
         //Act
-        var (rsp, res) = await Anonymous.POSTAsync<RegisterUserEndpointV1, UserCreateDto, ValidationProblemDetails>(request);
-        
+        var (rsp, res) =
+            await Anonymous.POSTAsync<RegisterUserEndpointV1, UserCreateDto, ValidationProblemDetails>(request);
+
         //Assert
         rsp.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         res.Errors.Should().ContainKeys("email", "password", "phoneNumber");
@@ -60,11 +56,11 @@ public sealed class RegisterUserEndpointV1Tests : BaseTest
             Email = AppDbContextSeeder.DefaultUser.Email,
             Password = AppDbContextSeeder.DefaultUserPassword,
         };
-        
+
         //Act
         var (rsp, res) =
             await Anonymous.POSTAsync<RegisterUserEndpointV1, UserCreateDto, ValidationProblemDetails>(request);
-        
+
         //Assert
         rsp.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 

@@ -1,7 +1,6 @@
-﻿
-namespace ApiBestPracticesExample.Domain.Entities;
+﻿namespace ApiBestPracticesExample.Domain.Entities;
 
-public partial class User
+public class User
 {
     public string Email { get; set; } = null!;
 

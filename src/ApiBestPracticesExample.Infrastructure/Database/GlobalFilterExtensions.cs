@@ -15,31 +15,33 @@ public static class GlobalFilterExtensions
         {
             var property = entityType.FindProperty(propertyName);
 
-            if (property is not null && property.ClrType == typeof(T))
+            if (property is null || property.ClrType != typeof(T))
             {
-                var newParam = Expression.Parameter(entityType.ClrType);
-                var filter = Expression.Lambda(
-                        Expression.Equal(Expression.Property(newParam, propertyName), Expression.Constant(value)),
-                        newParam);
+                continue;
+            }
 
-                var entity = modelBuilder.Entity(entityType.ClrType);
-                entity.HasQueryFilter(filter);
+            var newParam = Expression.Parameter(entityType.ClrType);
+            var filter = Expression.Lambda(
+                Expression.Equal(Expression.Property(newParam, propertyName), Expression.Constant(value)),
+                newParam);
 
-                var navigations = entityType
-                    .GetNavigations()
-                    .Where(item => item.ForeignKey.IsUnique);
+            var entity = modelBuilder.Entity(entityType.ClrType);
+            entity.HasQueryFilter(filter);
 
-                foreach (var navigation in navigations)
-                {
-                    var targetEntity = navigation.ForeignKey.DeclaringEntityType;
-                    newParam = Expression.Parameter(targetEntity.ClrType);
+            var entityNavigations = entityType
+                .GetNavigations()
+                .Where(item => item.ForeignKey.IsUnique);
 
-                    var memberAccess = CreateMemberAccess(newParam, entityType.ClrType.Name + "." + propertyName);
+            foreach (var navigation in entityNavigations)
+            {
+                var targetEntity = navigation.ForeignKey.DeclaringEntityType;
+                newParam = Expression.Parameter(targetEntity.ClrType);
 
-                    filter = Expression.Lambda(Expression.Equal(memberAccess, Expression.Constant(value)), newParam);
+                var memberAccess = CreateMemberAccess(newParam, entityType.ClrType.Name + "." + propertyName);
 
-                    modelBuilder.Entity(targetEntity.ClrType).HasQueryFilter(filter);
-                }
+                filter = Expression.Lambda(Expression.Equal(memberAccess, Expression.Constant(value)), newParam);
+
+                modelBuilder.Entity(targetEntity.ClrType).HasQueryFilter(filter);
             }
         }
     }

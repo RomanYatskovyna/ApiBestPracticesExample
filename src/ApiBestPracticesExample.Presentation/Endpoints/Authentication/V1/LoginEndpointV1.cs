@@ -10,7 +10,7 @@ public sealed class LoginEndpointV1 : Endpoint<LoginRequest, TokenResponse>
     private readonly AppDbContext _context;
     private readonly ILogger _logger;
 
-    public LoginEndpointV1(AppDbContext context,ILogger logger)
+    public LoginEndpointV1(AppDbContext context, ILogger logger)
     {
         _context = context;
         _logger = logger;
@@ -46,7 +46,6 @@ public sealed class LoginEndpointV1 : Endpoint<LoginRequest, TokenResponse>
             u.Roles.Add(user.RoleName);
             u.Claims.Add(new Claim(ClaimTypes.Email, user.Email));
             u.Claims.Add(new Claim(ClaimTypes.Name, user.Email));
-
         });
 
         _logger.Information("User {UserEmail} received token", user.Email);

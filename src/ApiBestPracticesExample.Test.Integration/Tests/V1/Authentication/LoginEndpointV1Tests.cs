@@ -16,8 +16,7 @@ public sealed class LoginEndpointV1Tests : BaseTest
         //Arrange
         var request = new LoginRequest
         {
-            Email = AppDbContextSeeder.DefaultAdmin.Email,
-            Password = AppDbContextSeeder.DefaultAdminPassword,
+            Email = AppDbContextSeeder.DefaultAdmin.Email, Password = AppDbContextSeeder.DefaultAdminPassword,
         };
         //Act
         var (rsp, res) = await Anonymous.POSTAsync<LoginEndpointV1, LoginRequest, TokenResponse>(request);
@@ -33,8 +32,6 @@ public sealed class LoginEndpointV1Tests : BaseTest
         var claims = GetClaimsFromJwt(res.AccessToken);
         claims.Should().Contain(c => c.Type == "role" && c.Value == dbUser.RoleName);
         claims.Should().Contain(c => c.Type == ClaimTypes.Email && c.Value == dbUser.Email);
-
-
     }
 
     [Fact]
@@ -43,8 +40,7 @@ public sealed class LoginEndpointV1Tests : BaseTest
         //Arrange
         var request = new LoginRequest
         {
-            Email = AppDbContextSeeder.DefaultUser.Email,
-            Password = AppDbContextSeeder.DefaultUserPassword,
+            Email = AppDbContextSeeder.DefaultUser.Email, Password = AppDbContextSeeder.DefaultUserPassword,
         };
         //Act
         var (rsp, res) = await Anonymous.POSTAsync<LoginEndpointV1, LoginRequest, TokenResponse>(request);
@@ -65,11 +61,7 @@ public sealed class LoginEndpointV1Tests : BaseTest
     public async Task Returns_404_When_UserIdAbsent()
     {
         //Arrange
-        var request = new LoginRequest
-        {
-            Email = "WrongEmail", 
-            Password = AppDbContextSeeder.DefaultAdminPassword,
-        };
+        var request = new LoginRequest { Email = "WrongEmail", Password = AppDbContextSeeder.DefaultAdminPassword };
         //Act
         var (rsp, _) = await Anonymous.POSTAsync<LoginEndpointV1, LoginRequest, string>(request);
         //Assert
@@ -80,11 +72,7 @@ public sealed class LoginEndpointV1Tests : BaseTest
     public async Task Returns_404_When_PasswordIsWrong()
     {
         //Arrange
-        var request = new LoginRequest
-        {
-            Email = AppDbContextSeeder.DefaultAdmin.Email,
-            Password = "WrongPassword",
-        };
+        var request = new LoginRequest { Email = AppDbContextSeeder.DefaultAdmin.Email, Password = "WrongPassword" };
         //Act
         var (rsp, _) = await Anonymous.POSTAsync<LoginEndpointV1, LoginRequest, TokenResponse>(request);
         //Assert

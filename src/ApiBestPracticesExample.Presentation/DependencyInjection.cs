@@ -57,9 +57,8 @@ public static class DependencyInjection
                 var tokenKey = configuration.GetRequiredValue("Authentication:Jwt:AccessTokenSigningKey");
                 o.SigningKey = tokenKey;
                 o.SigningStyle = TokenSigningStyle.Symmetric;
-
             }
-           );
+        );
         return services;
     }
 
@@ -85,6 +84,7 @@ public static class DependencyInjection
         services.AddOptionsWithValidation<JwtOptions>("Authentication:Jwt");
         return services;
     }
+
     public static IServiceCollection AddCustomDbContextPool<TContext>(
         this IServiceCollection services,
         string connectionString,
@@ -133,7 +133,7 @@ public static class DependencyInjection
         bool migrateDatabase = true,
         bool initData = true,
         bool initDevelopmentData = true
-        )
+    )
     {
         await using var scope = services.CreateAsyncScope();
         await using var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -162,7 +162,6 @@ public static class DependencyInjection
 
     public static async Task<WebApplication> PrepareDbAsync(this WebApplication app)
     {
-
         var dbSection = app.Configuration.GetRequiredSection("Database");
 
         await app.Services.PrepareDbAsync(
@@ -190,7 +189,8 @@ public static class DependencyInjection
         return services;
     }
 
-    public static IServiceCollection AddDefaultHealthChecks(this IServiceCollection services,string sqlConStr, string? redisConStr)
+    public static IServiceCollection AddDefaultHealthChecks(this IServiceCollection services, string sqlConStr,
+        string? redisConStr)
     {
         var health = services.AddHealthChecks()
             .AddSqlServer(sqlConStr);
@@ -209,10 +209,8 @@ public static class DependencyInjection
 
     public static WebApplication UseDefaultHealthChecks(this WebApplication app)
     {
-        app.MapHealthChecks("/_health", new HealthCheckOptions
-        {
-            ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
-        });
+        app.MapHealthChecks("/_health",
+            new HealthCheckOptions { ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse });
 
         app.MapHealthChecksUI(o =>
         {

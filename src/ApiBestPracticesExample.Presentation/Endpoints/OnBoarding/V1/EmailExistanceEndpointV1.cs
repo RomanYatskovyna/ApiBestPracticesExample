@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
-
-namespace ApiBestPracticesExample.Presentation.Endpoints.OnBoarding.V1;
+﻿namespace ApiBestPracticesExample.Presentation.Endpoints.OnBoarding.V1;
 
 public sealed class EmailExistenceEndpointV1 : Endpoint<string, bool>
 {

@@ -10,7 +10,7 @@ public sealed class RegisterUserEndpointV1 : Endpoint<UserCreateDto, Results<Ok<
     private readonly AppDbContext _context;
     private readonly ILogger _logger;
 
-    public RegisterUserEndpointV1(AppDbContext context,ILogger logger)
+    public RegisterUserEndpointV1(AppDbContext context, ILogger logger)
     {
         _context = context;
         _logger = logger;
@@ -29,7 +29,8 @@ public sealed class RegisterUserEndpointV1 : Endpoint<UserCreateDto, Results<Ok<
         Version((int)ApiSupportedVersions.V1);
     }
 
-    public override async Task<Results<Ok<UserDto>, BadRequest<ProblemDetails>>> ExecuteAsync(UserCreateDto req, CancellationToken ct)
+    public override async Task<Results<Ok<UserDto>, BadRequest<ProblemDetails>>> ExecuteAsync(UserCreateDto req,
+        CancellationToken ct)
     {
         if (await _context.Users.AnyAsync(u => u.Email == req.Email, ct))
         {
@@ -54,5 +55,4 @@ public sealed class RegisterUserEndpointV1 : Endpoint<UserCreateDto, Results<Ok<
         var userDto = user.MapUserToUserDto();
         return TypedResults.Ok(userDto);
     }
-
 }

@@ -47,6 +47,7 @@ public class ApiFixture : AppFixture<IApiMarker>
 
         base.ConfigureServices(s);
     }
+
     protected override async Task SetupAsync()
     {
         var conStr = _sqlContainer.GetConnectionString();
@@ -63,13 +64,10 @@ public class ApiFixture : AppFixture<IApiMarker>
             DbAdapter = DbAdapter.SqlServer,
         });
     }
+
     private Task InitDockerContainersAsync()
     {
-        var tasks = new[]
-        {
-            _sqlContainer.StartAsync(),
-            _redisContainer.StartAsync(),
-        };
+        var tasks = new[] { _sqlContainer.StartAsync(), _redisContainer.StartAsync() };
 
         return Task.WhenAll(tasks);
     }
@@ -81,11 +79,7 @@ public class ApiFixture : AppFixture<IApiMarker>
 
     protected override async Task TearDownAsync()
     {
-        var tasks = new[]
-        {
-            _sqlContainer.StopAsync(),
-            _redisContainer.StopAsync(),
-        };
+        var tasks = new[] { _sqlContainer.StopAsync(), _redisContainer.StopAsync() };
 
         await Task.WhenAll(tasks);
     }
@@ -97,8 +91,5 @@ public class ApiFixture : AppFixture<IApiMarker>
 
         var context = Services.GetRequiredService<AppDbContext>();
         context.ChangeTracker.Clear();
-
     }
-
-
 }

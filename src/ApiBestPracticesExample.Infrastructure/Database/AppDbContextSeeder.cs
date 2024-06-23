@@ -22,13 +22,13 @@ public static class AppDbContextSeeder
 
     public static async Task SeedDevelopmentTestDataAsync(this AppDbContext context)
     {
-        DefaultAdmin = new()
+        DefaultAdmin = new User
         {
             Email = "ReadOnlyAdmin@gmail.com",
             PasswordHash = PasswordEncrypter.HashPassword(DefaultAdminPassword),
             RoleName = SupportedRoles.Admin,
         };
-        DefaultUser = new()
+        DefaultUser = new User
         {
             PhoneNumber = "+1 408-555-1234",
             Email = "ReadOnlyUser@gmail.com",
@@ -50,7 +50,8 @@ public static class AppDbContextSeeder
 
     private static async Task SeedRolesAsync(AppDbContext context)
     {
-        var roleFields = typeof(SupportedRoles).GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy);
+        var roleFields =
+            typeof(SupportedRoles).GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy);
 
         var roleNames = roleFields.Select(r => r.GetValue(null)!.ToString()!).ToList();
 
@@ -61,6 +62,7 @@ public static class AppDbContextSeeder
                 await context.Roles.AddAsync(new Role { Name = roleName });
             }
         }
+
         await context.SaveChangesAsync();
     }
 }

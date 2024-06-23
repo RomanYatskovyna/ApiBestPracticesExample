@@ -62,8 +62,7 @@ public sealed class MyRefreshTokenServiceV2Tests : BaseTest
         var (loginRsp, loginRes) = await Anonymous.POSTAsync<LoginEndpointV1, LoginRequest, TokenResponse>(
             new LoginRequest
             {
-                Email = AppDbContextSeeder.DefaultAdmin.Email,
-                Password = AppDbContextSeeder.DefaultAdminPassword,
+                Email = AppDbContextSeeder.DefaultAdmin.Email, Password = AppDbContextSeeder.DefaultAdminPassword,
             });
         loginRsp.IsSuccessStatusCode.Should().BeTrue();
         //Act

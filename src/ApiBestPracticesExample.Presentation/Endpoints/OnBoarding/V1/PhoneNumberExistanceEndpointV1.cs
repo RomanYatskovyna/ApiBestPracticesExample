@@ -24,7 +24,6 @@ public sealed class PhoneNumberExistenceEndpointV1 : Endpoint<string, bool>
 
     public override Task<bool> ExecuteAsync(string req, CancellationToken ct)
     {
-       return _context.Users.AnyAsync(u => u.PhoneNumber == req, ct);
+        return _context.Users.AnyAsync(u => u.PhoneNumber == req, ct);
     }
-
 }

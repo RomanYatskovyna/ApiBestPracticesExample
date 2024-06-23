@@ -45,6 +45,7 @@ public abstract class BaseTest : IAsyncLifetime
 
         return token.Claims.ToList();
     }
+
     protected JwtSecurityToken GetTokenFromJwt(string accessToken)
     {
         var handler = new JwtSecurityTokenHandler();
@@ -56,12 +57,12 @@ public abstract class BaseTest : IAsyncLifetime
         var token = handler.ReadJwtToken(accessToken);
         return token;
     }
+
     private async Task SetupAdminDefaultClientAsync()
     {
         var (rsp, res) = await Anonymous.POSTAsync<LoginEndpointV1, LoginRequest, TokenResponse>(new LoginRequest
         {
-            Email = AppDbContextSeeder.DefaultAdmin.Email,
-            Password = AppDbContextSeeder.DefaultAdminPassword,
+            Email = AppDbContextSeeder.DefaultAdmin.Email, Password = AppDbContextSeeder.DefaultAdminPassword,
         });
         rsp.IsSuccessStatusCode.Should().BeTrue();
 

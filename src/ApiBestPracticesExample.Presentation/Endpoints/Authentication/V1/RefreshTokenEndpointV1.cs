@@ -1,8 +1,6 @@
 ﻿using ApiBestPracticesExample.Domain.Entities;
 using ApiBestPracticesExample.Infrastructure.Settings;
-using Azure;
 using FastEndpoints.Security;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Extensions.Options;
 using System.Security.Claims;
 
@@ -40,6 +38,7 @@ public sealed class RefreshTokenEndpointV1 : RefreshTokenService<TokenRequest, T
             });
         });
     }
+
     public override async Task PersistTokenAsync(TokenResponse response)
     {
         var refreshToken = await _context.RefreshTokens.SingleOrDefaultAsync(t => t.UserEmail == response.UserId);
@@ -52,9 +51,7 @@ public sealed class RefreshTokenEndpointV1 : RefreshTokenService<TokenRequest, T
 
             refreshToken = new RefreshToken
             {
-                Token = response.RefreshToken,
-                ExpiryDate = response.RefreshExpiry,
-                UserEmailNavigation = user,
+                Token = response.RefreshToken, ExpiryDate = response.RefreshExpiry, UserEmailNavigation = user,
             };
 
             await _context.AddAsync(refreshToken);
@@ -72,7 +69,6 @@ public sealed class RefreshTokenEndpointV1 : RefreshTokenService<TokenRequest, T
 
             _logger.Information("Updated refresh token for user {UserEmail}", refreshToken.UserEmail);
         }
-
     }
 
     public override async Task RefreshRequestValidationAsync(TokenRequest req)
