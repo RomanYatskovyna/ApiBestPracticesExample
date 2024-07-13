@@ -4,15 +4,15 @@ services:
   apibestpracticesexample.presentation:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=https://+:443;http://+:80
-      - ConnectionStrings__SqlConnection=Data Source=sqlserver; Database=testDb;User Id=sa;Password=Qwerty123$;TrustServerCertificate=True
-      - ConnectionStrings_RedisConnection=redis
+      - ASPNETCORE_HTTP_PORTS=8080
+      - ASPNETCORE_HTTPS_PORTS=8081
+      - ConnectionStrings__SqlConnection=Server=sqlserver;Database=ApiBestPracticesExample;User=sa;Password=Qwerty123$;TrustServerCertificate=True
+      - ConnectionStrings__RedisConnection=redis
     ports:
-      - "80"
-      - "443"
+      - "8080"
+      - "8081"
     volumes:
-      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
-      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
   sqlserver:
     environment:
       SA_PASSWORD: "Qwerty123$"

@@ -7,6 +7,8 @@
     <UserSecretsId>49cb3638-0249-458a-9390-364669f6cca5</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerComposeProjectPath>..\docker-compose.dcproj</DockerComposeProjectPath>
+    <RuntimeIdentifiers>linux-x64</RuntimeIdentifiers>
+    <EnableSdkContainerDebugging>True</EnableSdkContainerDebugging>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="AspNetCore.HealthChecks.Redis" Version="8.0.1" />
@@ -35,5 +37,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ApiBestPracticesExample.Infrastructure\ApiBestPracticesExample.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ContainerEnvironmentVariable Include="ASPNETCORE_HTTPS_PORTS">
+      <Value>8081</Value>
+    </ContainerEnvironmentVariable>
   </ItemGroup>
 </Project>

@@ -8,10 +8,6 @@
       "type": "mssql",
       "connectionId": "ConnectionStrings:SqlConnection",
       "dynamicId": null
-    },
-    "secrets1": {
-      "type": "secrets",
-      "dynamicId": null
     }
   }
 }

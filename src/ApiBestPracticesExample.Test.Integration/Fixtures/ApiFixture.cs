@@ -10,27 +10,37 @@ namespace ApiBestPracticesExample.Test.Integration.Fixtures;
 
 public class ApiFixture : AppFixture<IApiMarker>
 {
+
+    private readonly bool _enablePermanentPort = false;
+
     private const int SqlContainerPort = 63000;
     private const int RedisContainerPort = 62000;
 
 
-    private readonly RedisContainer _redisContainer = new RedisBuilder()
-        .WithImage("redis:latest")
-        .WithName("TestRedisDatabase-" + RedisContainerPort)
-        .WithPortBinding(RedisContainerPort.ToString(), "6379")
-        .Build();
+    private readonly RedisContainer _redisContainer;
 
-    private readonly MsSqlContainer _sqlContainer = new MsSqlBuilder()
-        .WithImage("mcr.microsoft.com/mssql/server:2022-latest")
-        .WithName("TestSqlDatabase-" + SqlContainerPort)
-        .WithPassword("Qwerty123$")
-        .WithPortBinding(SqlContainerPort.ToString(), "1433")
-        .Build();
+    private readonly MsSqlContainer _sqlContainer;
 
     private Respawner _respawner = null!;
 
     public ApiFixture(IMessageSink s) : base(s)
     {
+        var sqlBuilder = new MsSqlBuilder()
+            .WithImage("mcr.microsoft.com/mssql/server:2022-latest")
+            .WithPassword("Qwerty123$");
+        var redisBuilder = new RedisBuilder()
+            .WithImage("redis:latest");
+        if (_enablePermanentPort)
+        {
+            redisBuilder
+                .WithName("TestRedisDatabase-" + RedisContainerPort)
+                .WithPortBinding(RedisContainerPort.ToString(), "6379");
+            sqlBuilder
+                .WithName("TestSqlDatabase-" + SqlContainerPort)
+                .WithPortBinding(SqlContainerPort.ToString(), "1433");
+        }
+        _redisContainer = redisBuilder.Build();
+        _sqlContainer = sqlBuilder.Build();
     }
 
     protected override async Task PreSetupAsync()
