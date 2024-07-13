@@ -4,7 +4,7 @@
     <ProjectVersion>2.1</ProjectVersion>
     <DockerTargetOS>Linux</DockerTargetOS>
     <DockerPublishLocally>False</DockerPublishLocally>
-    <ProjectGuid>780a9def-0ac4-4759-ab01-532a093d7024</ProjectGuid>
+    <ProjectGuid>f5891700-a1e5-4619-b0fb-8c1e4a9a2fb9</ProjectGuid>
     <DockerLaunchAction>LaunchBrowser</DockerLaunchAction>
     <DockerServiceUrl>{Scheme}://localhost:{ServicePort}/swagger</DockerServiceUrl>
     <DockerServiceName>apibestpracticesexample.presentation</DockerServiceName>
