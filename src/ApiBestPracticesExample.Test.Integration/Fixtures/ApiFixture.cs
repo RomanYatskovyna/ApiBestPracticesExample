@@ -1,4 +1,7 @@
 ﻿using ApiBestPracticesExample.Presentation;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Respawn;
@@ -8,51 +11,47 @@ using Testcontainers.Redis;
 
 namespace ApiBestPracticesExample.Test.Integration.Fixtures;
 
-public class ApiFixture : AppFixture<IApiMarker>
+public sealed class ApiFixture : AppFixture<IApiMarker>
 {
 
-    private readonly bool _enablePermanentPort = false;
-
-    private const int SqlContainerPort = 63000;
-    private const int RedisContainerPort = 62000;
 
 
-    private readonly RedisContainer _redisContainer;
-
-    private readonly MsSqlContainer _sqlContainer;
+    private readonly ConnectionProviderBase _connectionProvider;
 
     private Respawner _respawner = null!;
 
+    private bool _isDbExist = false;
     public ApiFixture(IMessageSink s) : base(s)
     {
-        var sqlBuilder = new MsSqlBuilder()
-            .WithImage("mcr.microsoft.com/mssql/server:2022-latest")
-            .WithPassword("Qwerty123$");
-        var redisBuilder = new RedisBuilder()
-            .WithImage("redis:latest");
-        if (_enablePermanentPort)
+        var configuration = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.Testing.json")
+            .Build();
+
+        var conStr = configuration.GetConnectionString("SqlConnection");
+
+        if (string.IsNullOrEmpty(conStr))
         {
-            redisBuilder
-                .WithName("TestRedisDatabase-" + RedisContainerPort)
-                .WithPortBinding(RedisContainerPort.ToString(), "6379");
-            sqlBuilder
-                .WithName("TestSqlDatabase-" + SqlContainerPort)
-                .WithPortBinding(SqlContainerPort.ToString(), "1433");
+            _connectionProvider = new DockerConnectionProvider();
+            _isDbExist = false;
         }
-        _redisContainer = redisBuilder.Build();
-        _sqlContainer = sqlBuilder.Build();
+        else
+        {
+            _connectionProvider = new ExternalConnectionProvider(conStr);
+            _isDbExist = CanConnect(conStr);
+        }
     }
 
     protected override async Task PreSetupAsync()
     {
-        await InitDockerContainersAsync();
+        await _connectionProvider.InitializeAsync();
     }
 
     protected override void ConfigureServices(IServiceCollection s)
     {
+
         s.RemoveAll(typeof(DbContextOptions<AppDbContext>));
         s.RemoveAll(typeof(AppDbContext));
-        var conStr = _sqlContainer.GetConnectionString();
+        var conStr = _connectionProvider.GetDbConnectionString();
         s.AddCustomDbContextPool<AppDbContext>(conStr, true);
 
         base.ConfigureServices(s);
@@ -60,7 +59,13 @@ public class ApiFixture : AppFixture<IApiMarker>
 
     protected override async Task SetupAsync()
     {
-        var conStr = _sqlContainer.GetConnectionString();
+        var conStr = _connectionProvider.GetDbConnectionString();
+
+        if (!_isDbExist)
+        {
+            return;
+        }
+
         _respawner = await Respawner.CreateAsync(conStr, new RespawnerOptions
         {
             SchemasToInclude =
@@ -75,13 +80,6 @@ public class ApiFixture : AppFixture<IApiMarker>
         });
     }
 
-    private Task InitDockerContainersAsync()
-    {
-        var tasks = new[] { _sqlContainer.StartAsync(), _redisContainer.StartAsync() };
-
-        return Task.WhenAll(tasks);
-    }
-
     public Task InitDatabaseAsync()
     {
         return Services.PrepareDbAsync();
@@ -89,17 +87,35 @@ public class ApiFixture : AppFixture<IApiMarker>
 
     protected override async Task TearDownAsync()
     {
-        var tasks = new[] { _sqlContainer.StopAsync(), _redisContainer.StopAsync() };
-
-        await Task.WhenAll(tasks);
+        await _connectionProvider.DisposeAsync();
     }
 
     public async Task ResetDatabaseAsync()
     {
-        var conStr = _sqlContainer.GetConnectionString();
-        await _respawner.ResetAsync(conStr);
+        var conStr = _connectionProvider.GetDbConnectionString();
 
         var context = Services.GetRequiredService<AppDbContext>();
+        if (await context.Database.CanConnectAsync())
+        {
+            await _respawner.ResetAsync(conStr);
+        }
+
         context.ChangeTracker.Clear();
+    }
+    private static bool CanConnect(string connectionString)
+    {
+        try
+        {
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                return true;
+            }
+        }
+        catch (SqlException ex)
+        {
+            // You can check the exception number or message to handle different cases if needed.
+            return false;
+        }
     }
 }

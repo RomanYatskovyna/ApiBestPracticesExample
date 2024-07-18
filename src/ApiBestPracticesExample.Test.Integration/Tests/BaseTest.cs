@@ -25,6 +25,8 @@ public abstract class BaseTest : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
+        await Fixture.ResetDatabaseAsync();
+
         await Fixture.InitDatabaseAsync();
 
         Anonymous = Fixture.Client;
@@ -35,7 +37,6 @@ public abstract class BaseTest : IAsyncLifetime
 
     public async Task DisposeAsync()
     {
-        await Fixture.ResetDatabaseAsync();
         await DbContext.DisposeAsync();
     }
 

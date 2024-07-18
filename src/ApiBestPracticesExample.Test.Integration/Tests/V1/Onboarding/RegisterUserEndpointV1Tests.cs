@@ -25,7 +25,6 @@ public sealed class RegisterUserEndpointV1Tests : BaseTest
         var (rsp, res) = await Admin.POSTAsync<RegisterUserEndpointV1, UserCreateDto, UserDto>(request);
 
         //Assert
-        await rsp.Content.ReadAsStringAsync();
 
         rsp.StatusCode.Should().Be(HttpStatusCode.OK);
         res.Email.Should().Be(res.Email);
