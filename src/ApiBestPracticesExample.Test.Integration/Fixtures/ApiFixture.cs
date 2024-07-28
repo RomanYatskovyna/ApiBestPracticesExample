@@ -13,14 +13,10 @@ namespace ApiBestPracticesExample.Test.Integration.Fixtures;
 
 public sealed class ApiFixture : AppFixture<IApiMarker>
 {
-
-
-
     private readonly ConnectionProviderBase _connectionProvider;
 
     private Respawner _respawner = null!;
 
-    private bool _isDbExist = false;
     public ApiFixture(IMessageSink s) : base(s)
     {
         var configuration = new ConfigurationBuilder()
@@ -29,16 +25,9 @@ public sealed class ApiFixture : AppFixture<IApiMarker>
 
         var conStr = configuration.GetConnectionString("SqlConnection");
 
-        if (string.IsNullOrEmpty(conStr))
-        {
-            _connectionProvider = new DockerConnectionProvider();
-            _isDbExist = false;
-        }
-        else
-        {
-            _connectionProvider = new ExternalConnectionProvider(conStr);
-            _isDbExist = CanConnect(conStr);
-        }
+        _connectionProvider = string.IsNullOrEmpty(conStr)
+            ? new DockerConnectionProvider()
+            : new ExternalConnectionProvider(conStr);
     }
 
     protected override async Task PreSetupAsync()
@@ -61,7 +50,7 @@ public sealed class ApiFixture : AppFixture<IApiMarker>
     {
         var conStr = _connectionProvider.GetDbConnectionString();
 
-        if (!_isDbExist)
+        if (!await CanConnectAsync(conStr))
         {
             return;
         }
@@ -102,17 +91,16 @@ public sealed class ApiFixture : AppFixture<IApiMarker>
 
         context.ChangeTracker.Clear();
     }
-    private static bool CanConnect(string connectionString)
+    private static async Task<bool> CanConnectAsync(string connectionString)
     {
         try
         {
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                connection.Open();
-                return true;
-            }
+            await using SqlConnection connection = new SqlConnection(connectionString);
+            await connection.OpenAsync();
+            await connection.CloseAsync();
+            return true;
         }
-        catch (SqlException ex)
+        catch (SqlException)
         {
             // You can check the exception number or message to handle different cases if needed.
             return false;
