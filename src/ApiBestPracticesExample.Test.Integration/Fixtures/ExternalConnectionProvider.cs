@@ -1,7 +1,4 @@
-﻿using ApiBestPracticesExample.Presentation;
-using Microsoft.Extensions.Configuration;
-
-namespace ApiBestPracticesExample.Test.Integration.Fixtures;
+﻿namespace ApiBestPracticesExample.Test.Integration.Fixtures;
 public sealed class ExternalConnectionProvider:ConnectionProviderBase
 {
     private readonly string _sqlConnectionStr;

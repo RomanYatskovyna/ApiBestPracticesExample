@@ -45,4 +45,8 @@
       <Value>8081</Value>
     </ContainerEnvironmentVariable>
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="logs\" />
+  </ItemGroup>
 </Project>

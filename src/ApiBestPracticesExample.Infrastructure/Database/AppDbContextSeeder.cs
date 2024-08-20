@@ -20,7 +20,7 @@ public static class AppDbContextSeeder
         await SeedRolesAsync(context);
     }
 
-    public static async Task SeedDevelopmentTestDataAsync(this AppDbContext context)
+    public static async Task SeedDevelopmentDataAsync(this AppDbContext context)
     {
         DefaultAdmin = new User
         {

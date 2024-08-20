@@ -1,7 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using Testcontainers.MsSql;
-
-namespace ApiBestPracticesExample.Test.Integration.Fixtures;
+﻿namespace ApiBestPracticesExample.Test.Integration.Fixtures;
 
 public abstract class ConnectionProviderBase : IAsyncLifetime
 {
@@ -9,7 +6,6 @@ public abstract class ConnectionProviderBase : IAsyncLifetime
 
     public virtual Task InitializeAsync()
     {
-
         return Task.CompletedTask;
     }
 

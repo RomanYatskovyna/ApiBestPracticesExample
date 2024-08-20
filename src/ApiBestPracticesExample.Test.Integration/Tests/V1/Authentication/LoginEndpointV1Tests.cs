@@ -1,4 +1,4 @@
-﻿using ApiBestPracticesExample.Presentation.Endpoints.Authentication.V1;
+﻿using ApiBestPracticesExample.Presentation.Endpoints.V1.Authentication;
 using System.Security.Claims;
 
 namespace ApiBestPracticesExample.Test.Integration.Tests.V1.Authentication;
@@ -6,7 +6,7 @@ namespace ApiBestPracticesExample.Test.Integration.Tests.V1.Authentication;
 [Collection("TestCollection")]
 public sealed class LoginEndpointV1Tests : BaseTest
 {
-    public LoginEndpointV1Tests(ApiFixture fixture) : base(fixture)
+    public LoginEndpointV1Tests(TestFixture fixture) : base(fixture)
     {
     }
 

@@ -1,23 +1,20 @@
 ﻿using ApiBestPracticesExample.Presentation;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Respawn;
 using Respawn.Graph;
-using Testcontainers.MsSql;
-using Testcontainers.Redis;
 
 namespace ApiBestPracticesExample.Test.Integration.Fixtures;
 
-public sealed class ApiFixture : AppFixture<IApiMarker>
+public sealed class TestFixture : AppFixture<IApiMarker>
 {
     private readonly ConnectionProviderBase _connectionProvider;
 
     private Respawner _respawner = null!;
 
-    public ApiFixture(IMessageSink s) : base(s)
+    public TestFixture(IMessageSink s) : base(s)
     {
         var configuration = new ConfigurationBuilder()
             .AddJsonFile("appsettings.Testing.json")
@@ -37,7 +34,6 @@ public sealed class ApiFixture : AppFixture<IApiMarker>
 
     protected override void ConfigureServices(IServiceCollection s)
     {
-
         s.RemoveAll(typeof(DbContextOptions<AppDbContext>));
         s.RemoveAll(typeof(AppDbContext));
         var conStr = _connectionProvider.GetDbConnectionString();
@@ -69,9 +65,10 @@ public sealed class ApiFixture : AppFixture<IApiMarker>
         });
     }
 
-    public Task InitDatabaseAsync()
+    public async Task InitDatabaseAsync()
     {
-        return Services.PrepareDbAsync();
+        await Services.PrepareDbAsync();
+
     }
 
     protected override async Task TearDownAsync()
@@ -83,26 +80,24 @@ public sealed class ApiFixture : AppFixture<IApiMarker>
     {
         var conStr = _connectionProvider.GetDbConnectionString();
 
-        var context = Services.GetRequiredService<AppDbContext>();
-        if (await context.Database.CanConnectAsync())
+        if (await CanConnectAsync(conStr))
         {
             await _respawner.ResetAsync(conStr);
         }
-
-        context.ChangeTracker.Clear();
     }
     private static async Task<bool> CanConnectAsync(string connectionString)
     {
         try
         {
             await using SqlConnection connection = new SqlConnection(connectionString);
+
             await connection.OpenAsync();
             await connection.CloseAsync();
+            
             return true;
         }
         catch (SqlException)
         {
-            // You can check the exception number or message to handle different cases if needed.
             return false;
         }
     }

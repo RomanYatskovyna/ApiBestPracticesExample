@@ -69,6 +69,12 @@ public static class DependencyInjection
             config.Serializer.Options.Converters.Add(new JsonStringEnumConverter());
             config.Endpoints.Configurator = ep =>
             {
+                if (ep.Verbs.Contains("POST")|| ep.Verbs.Contains("PUT"))
+                {
+                    ep.Description(b => b.ProducesProblemFE());
+                }
+                ep.Description(b => b.ProducesProblemFE<InternalErrorResponse>(500));
+                    
                 ep.PostProcessors(Order.After, new ErrorLogger());
             };
             config.Endpoints.ShortNames = true;
@@ -95,11 +101,11 @@ public static class DependencyInjection
         {
             options.UseSqlServer(connectionString, sqlServerOptions =>
                 {
-                    var assemblyName = typeof(AppDbContext).Assembly.FullName;
-                    sqlServerOptions.MigrationsAssembly(assemblyName)
-                        .UseDateOnlyTimeOnly();
+                    sqlServerOptions.UseDateOnlyTimeOnly()
+                        .UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
                 })
                 .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+
             if (isDevelopment)
             {
                 options.EnableDetailedErrors()
@@ -152,7 +158,7 @@ public static class DependencyInjection
 
             if (initDevelopmentData)
             {
-                await context.SeedDevelopmentTestDataAsync();
+                await context.SeedDevelopmentDataAsync();
                 logger.Information("Development data seeded successfully");
             }
         }

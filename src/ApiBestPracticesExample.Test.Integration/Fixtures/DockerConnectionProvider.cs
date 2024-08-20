@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using Testcontainers.MsSql;
+﻿using Testcontainers.MsSql;
 using Testcontainers.Redis;
 
 namespace ApiBestPracticesExample.Test.Integration.Fixtures;

@@ -1,11 +1,10 @@
-﻿using ApiBestPracticesExample.Presentation.Endpoints.OnBoarding.V1;
+﻿using ApiBestPracticesExample.Presentation.Endpoints.V1.OnBoarding;
 
 namespace ApiBestPracticesExample.Test.Integration.Tests.V1.Onboarding;
 
-[Collection("TestCollection")]
 public sealed class PhoneNumberExistenceEndpointV1Tests : BaseTest
 {
-    public PhoneNumberExistenceEndpointV1Tests(ApiFixture fixture) : base(fixture)
+    public PhoneNumberExistenceEndpointV1Tests(TestFixture fixture) : base(fixture)
     {
     }
 

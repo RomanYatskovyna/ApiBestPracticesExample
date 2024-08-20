@@ -1,3 +1,13 @@
-﻿namespace ApiBestPracticesExample.Test.Integration.InitDataHelpers;
+﻿using Microsoft.Extensions.DependencyInjection;
 
-public static class TestInitDataHelpers;
+namespace ApiBestPracticesExample.Test.Integration.InitDataHelpers;
+
+public static class TestInitDataHelpers
+{
+    public static Task InitializeTestDataAsync(this IServiceProvider services)
+    {
+        var context = services.GetRequiredService<AppDbContext>();
+
+        return Task.CompletedTask;
+    }
+}

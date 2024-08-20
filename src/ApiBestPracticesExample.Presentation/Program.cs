@@ -1,5 +1,5 @@
 using ApiBestPracticesExample.Presentation;
-using ApiBestPracticesExample.Presentation.Endpoints.Authentication.V1;
+using ApiBestPracticesExample.Presentation.Endpoints.V1.Authentication;
 using FastEndpoints.Swagger;
 
 var apiVersions = Enum.GetValues<ApiSupportedVersions>().Select(version => (int)version).ToList();

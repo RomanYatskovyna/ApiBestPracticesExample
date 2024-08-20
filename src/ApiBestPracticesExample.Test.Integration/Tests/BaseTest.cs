@@ -1,4 +1,4 @@
-﻿using ApiBestPracticesExample.Presentation.Endpoints.Authentication.V1;
+﻿using ApiBestPracticesExample.Presentation.Endpoints.V1.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.DependencyInjection;
 using System.IdentityModel.Tokens.Jwt;
@@ -11,9 +11,9 @@ namespace ApiBestPracticesExample.Test.Integration.Tests;
 public abstract class BaseTest : IAsyncLifetime
 {
     protected readonly AppDbContext DbContext;
-    protected readonly ApiFixture Fixture;
+    protected readonly TestFixture Fixture;
 
-    protected BaseTest(ApiFixture fixture)
+    protected BaseTest(TestFixture fixture)
     {
         Fixture = fixture;
         DbContext = Fixture.Services.GetRequiredService<AppDbContext>();
@@ -28,11 +28,10 @@ public abstract class BaseTest : IAsyncLifetime
         await Fixture.ResetDatabaseAsync();
 
         await Fixture.InitDatabaseAsync();
-
         Anonymous = Fixture.Client;
 
-        await SetupAdminDefaultClientAsync();
-        await SetupClientDefaultClientAsync();
+        await SetupDefaultAdminAsync();
+        await SetupDefaultClientAsync();
     }
 
     public async Task DisposeAsync()
@@ -59,7 +58,7 @@ public abstract class BaseTest : IAsyncLifetime
         return token;
     }
 
-    private async Task SetupAdminDefaultClientAsync()
+    private async Task SetupDefaultAdminAsync()
     {
         var (rsp, res) = await Anonymous.POSTAsync<LoginEndpointV1, LoginRequest, TokenResponse>(new LoginRequest
         {
@@ -72,7 +71,7 @@ public abstract class BaseTest : IAsyncLifetime
                 new AuthenticationHeaderValue(JwtBearerDefaults.AuthenticationScheme, res.AccessToken));
     }
 
-    private async Task SetupClientDefaultClientAsync()
+    private async Task SetupDefaultClientAsync()
     {
         var (rsp, res) = await Anonymous.POSTAsync<LoginEndpointV1, LoginRequest, TokenResponse>(new LoginRequest
         {

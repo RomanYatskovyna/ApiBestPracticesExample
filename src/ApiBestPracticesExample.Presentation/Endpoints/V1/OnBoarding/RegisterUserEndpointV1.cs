@@ -3,7 +3,7 @@ using ApiBestPracticesExample.Contracts.Dtos.Onboarding;
 using ApiBestPracticesExample.Infrastructure.Mappers;
 using Microsoft.AspNetCore.Http.HttpResults;
 
-namespace ApiBestPracticesExample.Presentation.Endpoints.OnBoarding.V1;
+namespace ApiBestPracticesExample.Presentation.Endpoints.V1.OnBoarding;
 
 public sealed class RegisterUserEndpointV1 : Endpoint<UserCreateDto, Results<Ok<UserDto>, BadRequest<ProblemDetails>>>
 {
@@ -23,8 +23,7 @@ public sealed class RegisterUserEndpointV1 : Endpoint<UserCreateDto, Results<Ok<
         Description(d => { d.WithDisplayName("RegisterUser"); });
         Summary(s =>
         {
-            s.Summary = "short summary goes here";
-            s.Description = "long description goes here";
+            s.Summary = "Register new user into the system";
         });
         Version((int)ApiSupportedVersions.V1);
     }

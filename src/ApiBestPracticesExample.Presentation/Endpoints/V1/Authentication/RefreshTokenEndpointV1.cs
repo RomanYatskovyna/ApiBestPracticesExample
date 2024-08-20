@@ -4,7 +4,7 @@ using FastEndpoints.Security;
 using Microsoft.Extensions.Options;
 using System.Security.Claims;
 
-namespace ApiBestPracticesExample.Presentation.Endpoints.Authentication.V1;
+namespace ApiBestPracticesExample.Presentation.Endpoints.V1.Authentication;
 
 public sealed class RefreshTokenEndpointV1 : RefreshTokenService<TokenRequest, TokenResponse>
 {
@@ -51,7 +51,9 @@ public sealed class RefreshTokenEndpointV1 : RefreshTokenService<TokenRequest, T
 
             refreshToken = new RefreshToken
             {
-                Token = response.RefreshToken, ExpiryDate = response.RefreshExpiry, UserEmailNavigation = user,
+                Token = response.RefreshToken,
+                ExpiryDate = response.RefreshExpiry,
+                UserEmailNavigation = user,
             };
 
             await _context.AddAsync(refreshToken);

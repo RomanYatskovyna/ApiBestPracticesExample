@@ -1,12 +1,11 @@
 ﻿using ApiBestPracticesExample.Contracts.Dtos.Onboarding;
-using ApiBestPracticesExample.Presentation.Endpoints.OnBoarding.V1;
+using ApiBestPracticesExample.Presentation.Endpoints.V1.OnBoarding;
 
 namespace ApiBestPracticesExample.Test.Integration.Tests.V1.Onboarding;
 
-[Collection("TestCollection")]
 public sealed class RegisterUserEndpointV1Tests : BaseTest
 {
-    public RegisterUserEndpointV1Tests(ApiFixture fixture) : base(fixture)
+    public RegisterUserEndpointV1Tests(TestFixture fixture) : base(fixture)
     {
     }
 
@@ -27,7 +26,7 @@ public sealed class RegisterUserEndpointV1Tests : BaseTest
         //Assert
 
         rsp.StatusCode.Should().Be(HttpStatusCode.OK);
-        res.Email.Should().Be(res.Email);
+        res.Email.Should().Be(request.Email);
     }
 
     [Fact]

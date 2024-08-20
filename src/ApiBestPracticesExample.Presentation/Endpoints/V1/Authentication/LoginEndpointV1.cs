@@ -2,8 +2,9 @@
 using ApiBestPracticesExample.Infrastructure.Services;
 using FastEndpoints.Security;
 using System.Security.Claims;
+using System.Security.Cryptography;
 
-namespace ApiBestPracticesExample.Presentation.Endpoints.Authentication.V1;
+namespace ApiBestPracticesExample.Presentation.Endpoints.V1.Authentication;
 
 public sealed class LoginEndpointV1 : Endpoint<LoginRequest, TokenResponse>
 {
@@ -29,6 +30,7 @@ public sealed class LoginEndpointV1 : Endpoint<LoginRequest, TokenResponse>
             s.Summary = "User authorization endpoint";
             s.Description = "Here user can login and receive access and refresh tokens";
         });
+
         Version((int)ApiSupportedVersions.V1);
     }
 

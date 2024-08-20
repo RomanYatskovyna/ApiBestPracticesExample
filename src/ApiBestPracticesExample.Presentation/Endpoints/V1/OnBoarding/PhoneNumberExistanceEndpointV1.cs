@@ -1,4 +1,4 @@
-﻿namespace ApiBestPracticesExample.Presentation.Endpoints.OnBoarding.V1;
+﻿namespace ApiBestPracticesExample.Presentation.Endpoints.V1.OnBoarding;
 
 public sealed class PhoneNumberExistenceEndpointV1 : Endpoint<string, bool>
 {
@@ -16,8 +16,7 @@ public sealed class PhoneNumberExistenceEndpointV1 : Endpoint<string, bool>
         Description(d => { d.WithDisplayName("ValidatePhoneNumber"); });
         Summary(s =>
         {
-            s.Summary = "short summary goes here";
-            s.Description = "long description goes here";
+            s.Summary = "Checks if user with such phone number already exists";
         });
         Version((int)ApiSupportedVersions.V1);
     }
